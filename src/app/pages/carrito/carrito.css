@@ -1,0 +1,33 @@
+.carrito-icono {
+  font-size: 70px;
+  color: #d94f7d;
+}
+
+.imagen-producto {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+
+/* =========================
+   DISEÑO PARA CELULAR
+   ========================= */
+
+@media (max-width: 576px) {
+
+  .carrito-icono {
+    font-size: 55px;
+  }
+
+  .imagen-producto {
+    width: 70px;
+    height: 70px;
+  }
+
+  .card-body {
+    padding: 15px;
+  }
+
+}

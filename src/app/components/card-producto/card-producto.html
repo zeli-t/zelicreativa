@@ -1,0 +1,95 @@
+<div class="card producto-card h-100">
+
+  <div class="imagen-producto">
+
+    <img
+      [src]="imagen"
+      class="card-img-top"
+      [alt]="nombre">
+
+    <span
+      *ngIf="oferta"
+      class="badge bg-danger oferta">
+
+      Oferta
+
+    </span>
+
+    <button
+      class="btn-favorito"
+      type="button"
+      (click)="cambiarFavorito()">
+
+      <i
+        class="bi"
+        [class.bi-heart]="!favorito"
+        [class.bi-heart-fill]="favorito">
+      </i>
+
+    </button>
+
+  </div>
+
+  <div class="card-body">
+
+    <h5
+      class="card-title nombre-producto"
+      (click)="verDetalle()">
+
+      {{ nombre }}
+
+    </h5>
+
+    <div class="precios">
+
+      <span
+        *ngIf="oferta"
+        class="precio-anterior">
+
+        ${{ precioAnterior }}
+
+      </span>
+
+      <span class="precio">
+
+        ${{ precio }}
+
+      </span>
+
+    </div>
+
+    <div class="botones mt-3">
+
+      <button
+        class="btn btn-dark"
+        (click)="agregarAlCarrito()">
+
+        <i class="bi bi-cart-plus"></i>
+
+        Agregar al carrito
+
+      </button>
+
+      <button
+        class="btn btn-outline-secondary"
+        (click)="abrirQuickView()">
+
+        <i class="bi bi-eye"></i>
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<app-quick-view
+  *ngIf="mostrarQuickView"
+  [producto]="{
+    nombre: nombre,
+    precio: precio,
+    imagen: imagen
+  }"
+  (cerrar)="cerrarQuickView()">
+</app-quick-view>

@@ -1,0 +1,54 @@
+<div class="modal-fondo" *ngIf="producto">
+
+  <div class="modal-producto">
+
+    <button
+      class="btn-cerrar"
+      (click)="cerrarVentana()">
+      
+
+      <i class="bi bi-x-lg"></i>
+
+    </button>
+
+    <div class="row align-items-center">
+
+      <div class="col-md-6">
+
+        <img
+          [src]="producto.imagen"
+          [alt]="producto.nombre"
+          class="imagen-modal">
+
+      </div>
+
+      <div class="col-md-6">
+
+        <h2>{{ producto.nombre }}</h2>
+
+        <h3>${{ producto.precio }}</h3>
+
+        <p>
+          Producto ideal para darle un toque creativo
+          y bonito a tus proyectos.
+        </p>
+
+        <p>
+          <strong>Disponible:</strong> En existencia
+        </p>
+
+      <button
+  class="btn btn-dark w-100"
+  (click)="agregarAlCarrito()">
+
+  <i class="bi bi-cart-plus"></i>
+  Agregar al carrito
+
+</button>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

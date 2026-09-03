@@ -1,0 +1,78 @@
+.footer {
+  background-color: rgb(255, 230, 238);
+  color: #333;
+  text-align: center;
+}
+
+.footer .container {
+  max-width: 900px;
+}
+
+.footer h5 {
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.footer p {
+  margin-bottom: 0;
+}
+
+.redes {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+}
+
+.redes a {
+  color: #333;
+  font-size: 24px;
+  text-decoration: none;
+}
+
+.redes a:hover {
+  color: #d94f7d;
+}
+
+.footer-bottom {
+  background-color: rgb(255, 190, 210);
+  text-align: center;
+  padding: 15px;
+}
+
+
+/* =========================
+   DISEÑO PARA CELULAR
+   ========================= */
+
+@media (max-width: 576px) {
+
+  .footer {
+    font-size: 14px;
+  }
+
+  .footer .container {
+    padding: 30px 20px !important;
+  }
+
+  .footer h5 {
+    font-size: 17px;
+  }
+
+  .footer p {
+    font-size: 13px;
+  }
+
+  .redes {
+    gap: 15px;
+  }
+
+  .redes a {
+    font-size: 22px;
+  }
+
+  .footer-bottom {
+    padding: 12px 10px;
+    font-size: 12px;
+  }
+
+}

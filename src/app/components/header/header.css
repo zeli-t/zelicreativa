@@ -1,0 +1,103 @@
+.logo-header {
+  width: 105px;
+  height: 95px;
+  object-fit: contain;
+}
+
+.navbar-brand {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.bi {
+  vertical-align: middle;
+}
+
+:host {
+  position: sticky;
+  top: 0;
+  z-index: 1100;
+}
+
+.sugerencias {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: calc(100% - 48px);
+  background-color: white;
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  z-index: 3000;
+}
+
+.sugerencia {
+  display: block;
+  width: 100%;
+  border: none;
+  background-color: white;
+  text-align: left;
+  padding: 10px 15px;
+}
+
+.sugerencia:hover {
+  background-color: rgb(255, 230, 238);
+  color: #d94f7d;
+}
+
+
+/* =========================
+   DISEÑO PARA CELULAR
+   ========================= */
+
+@media (max-width: 576px) {
+
+  .logo-header {
+    width: 70px;
+    height: 65px;
+  }
+
+  .navbar-brand {
+    font-size: 18px;
+  }
+
+  .navbar {
+    padding: 5px 10px;
+  }
+
+  .navbar-toggler {
+    padding: 5px 8px;
+  }
+
+  .navbar-collapse {
+    padding-top: 10px;
+  }
+
+  .navbar-nav {
+    margin-bottom: 10px;
+  }
+
+  .position-relative {
+    width: 100%;
+  }
+
+  form.d-flex {
+    width: 100%;
+  }
+
+  form.d-flex .form-control {
+    width: 100%;
+  }
+
+  .d-flex.align-items-center.ms-3.gap-3 {
+    margin-left: 0 !important;
+    justify-content: center;
+    margin-top: 15px;
+    margin-bottom: 10px;
+  }
+
+  .sugerencias {
+    width: calc(100% - 48px);
+  }
+
+}

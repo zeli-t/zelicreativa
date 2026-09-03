@@ -1,0 +1,30 @@
+
+<div class="card categoria-card">
+
+  <img
+    [src]="imagen"
+    class="card-img-top"
+    [alt]="nombre">
+
+  <div class="card-body text-center">
+
+    <h5 class="card-title">
+      {{ nombre }}
+    </h5>
+
+    <p class="card-text">
+      {{ descripcion }}
+    </p>
+
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-dark"
+      (click)="verProductos()">
+
+      Ver productos
+
+    </button>
+
+  </div>
+
+</div>

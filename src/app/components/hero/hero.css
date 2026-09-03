@@ -1,0 +1,51 @@
+.hero {
+  background-color: rgb(255, 239, 190);
+  padding: 60px 20px;
+}
+
+.hero h1 {
+  font-size: 42px;
+  font-weight: bold;
+}
+
+.hero p {
+  font-size: 18px;
+  margin: 20px 0;
+}
+
+.hero-icon {
+  font-size: 150px;
+  color: #d94f7d;
+}
+
+
+/* =========================
+   DISEÑO PARA CELULAR
+   ========================= */
+
+@media (max-width: 576px) {
+
+  .hero {
+    padding: 40px 20px;
+    text-align: center;
+  }
+
+  .hero h1 {
+    font-size: 30px;
+  }
+
+  .hero p {
+    font-size: 16px;
+    margin: 15px 0;
+  }
+
+  .hero-icon {
+    font-size: 90px;
+    margin-top: 20px;
+  }
+
+  .hero .btn {
+    width: 100%;
+  }
+
+}

@@ -1,0 +1,524 @@
+<div class="container py-5">
+
+  <div class="row justify-content-center">
+
+    <div class="col-lg-9">
+
+      <h2 class="text-center mb-4">
+        <i class="bi bi-bag-check"></i>
+        Finalizar compra
+      </h2>
+
+      <!-- PASOS -->
+
+      <div class="pasos mb-4">
+
+        <div
+          class="paso"
+          [class.activo]="paso === 1">
+
+          <span>1</span>
+          Datos de envío
+
+        </div>
+
+        <div
+          class="paso"
+          [class.activo]="paso === 2">
+
+          <span>2</span>
+          Pago
+
+        </div>
+
+      </div>
+
+
+      <!-- PASO 1 -->
+
+      <div
+        class="card p-4"
+        *ngIf="paso === 1">
+
+        <h4 class="mb-4">
+          <i class="bi bi-truck"></i>
+          Datos de envío
+        </h4>
+
+
+        <div class="row">
+
+          <!-- NOMBRE -->
+
+          <div class="col-md-6 mb-3">
+
+            <label>Nombre completo</label>
+
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="nombre"
+              [class.is-invalid]="enviado && !nombre"
+              [class.is-valid]="nombre"
+              placeholder="Tu nombre">
+
+            <div
+              class="invalid-feedback"
+              *ngIf="enviado && !nombre">
+
+              El nombre es obligatorio.
+
+            </div>
+
+          </div>
+
+
+          <!-- CORREO -->
+
+          <div class="col-md-6 mb-3">
+
+            <label>Correo electrónico</label>
+
+            <input
+              type="email"
+              class="form-control"
+              [(ngModel)]="correo"
+              [class.is-invalid]="enviado && !correo"
+              [class.is-valid]="correo"
+              placeholder="correo@ejemplo.com">
+
+            <div
+              class="invalid-feedback"
+              *ngIf="enviado && !correo">
+
+              El correo es obligatorio.
+
+            </div>
+
+          </div>
+
+
+          <!-- DIRECCIÓN -->
+
+          <div class="col-12 mb-3">
+
+            <label>Dirección</label>
+
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="direccion"
+              [class.is-invalid]="enviado && !direccion"
+              [class.is-valid]="direccion"
+              placeholder="Calle, número y colonia">
+
+            <div
+              class="invalid-feedback"
+              *ngIf="enviado && !direccion">
+
+              La dirección es obligatoria.
+
+            </div>
+
+          </div>
+
+
+          <!-- CIUDAD -->
+
+          <div class="col-md-6 mb-3">
+
+            <label>Ciudad</label>
+
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="ciudad"
+              [class.is-invalid]="enviado && !ciudad"
+              [class.is-valid]="ciudad"
+              placeholder="Ciudad">
+
+            <div
+              class="invalid-feedback"
+              *ngIf="enviado && !ciudad">
+
+              La ciudad es obligatoria.
+
+            </div>
+
+          </div>
+
+
+          <!-- CÓDIGO POSTAL -->
+
+          <div class="col-md-3 mb-3">
+
+            <label>Código postal</label>
+
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="codigoPostal"
+              (input)="calcularEnvio()"
+              maxlength="5"
+              placeholder="00000"
+              [class.is-invalid]="enviado && !/^\d{5}$/.test(codigoPostal)"
+              [class.is-valid]="/^\d{5}$/.test(codigoPostal)">
+
+            <div
+              class="invalid-feedback"
+              *ngIf="enviado && !/^\d{5}$/.test(codigoPostal)">
+
+              Ingresa un código postal válido de 5 dígitos.
+
+            </div>
+
+          </div>
+
+
+          <!-- TELÉFONO -->
+
+          <div class="col-md-3 mb-3">
+
+            <label>Teléfono</label>
+
+            <input
+              type="tel"
+              class="form-control"
+              [(ngModel)]="telefono"
+              [class.is-invalid]="enviado && !telefono"
+              [class.is-valid]="telefono"
+              placeholder="10 dígitos">
+
+            <div
+              class="invalid-feedback"
+              *ngIf="enviado && !telefono">
+
+              El teléfono es obligatorio.
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- CUPÓN -->
+
+        <div class="cupon mt-3">
+
+          <label>
+            <i class="bi bi-ticket-perforated"></i>
+            ¿Tienes un cupón?
+          </label>
+
+          <div class="d-flex gap-2 mt-2">
+
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="cupon"
+              placeholder="Ingresa tu cupón">
+
+            <button
+              class="btn btn-outline-dark"
+              (click)="aplicarCupon()">
+
+              Aplicar
+
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- RESUMEN -->
+
+        <div class="resumen mt-4">
+
+          <div>
+            <span>Subtotal</span>
+            <strong>${{ subtotal }}</strong>
+          </div>
+
+          <div>
+            <span>IVA (16%)</span>
+            <strong>${{ impuestos | number:'1.2-2' }}</strong>
+          </div>
+
+          <div>
+            <span>Envío</span>
+            <strong>${{ envio }}</strong>
+          </div>
+
+          <div *ngIf="descuento > 0">
+
+            <span>Descuento</span>
+
+            <strong>
+              -${{ descuento }}
+            </strong>
+
+          </div>
+
+          <hr>
+
+          <div class="total">
+
+            <span>Total</span>
+
+            <strong>
+              ${{ total | number:'1.2-2' }}
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <button
+          class="btn btn-dark w-100 mt-4"
+          (click)="siguientePaso()">
+
+          Continuar al pago
+          <i class="bi bi-arrow-right"></i>
+
+        </button>
+
+      </div>
+
+
+      <!-- PASO 2 -->
+
+      <div
+        class="card p-4"
+        *ngIf="paso === 2">
+
+        <h4 class="mb-4">
+
+          <i class="bi bi-credit-card"></i>
+
+          Método de pago
+
+        </h4>
+
+
+        <div class="metodos">
+
+          <label
+            class="metodo"
+            [class.seleccionado]="metodoPago === 'tarjeta'">
+
+            <input
+              type="radio"
+              name="pago"
+              value="tarjeta"
+              [(ngModel)]="metodoPago">
+
+            <i class="bi bi-credit-card"></i>
+
+            Tarjeta
+
+          </label>
+
+
+          <label
+            class="metodo"
+            [class.seleccionado]="metodoPago === 'transferencia'">
+
+            <input
+              type="radio"
+              name="pago"
+              value="transferencia"
+              [(ngModel)]="metodoPago">
+
+            <i class="bi bi-bank"></i>
+
+            Transferencia
+
+          </label>
+
+
+          <label
+            class="metodo"
+            [class.seleccionado]="metodoPago === 'paypal'">
+
+            <input
+              type="radio"
+              name="pago"
+              value="paypal"
+              [(ngModel)]="metodoPago">
+
+            <i class="bi bi-paypal"></i>
+
+            PayPal
+
+          </label>
+
+        </div>
+
+
+        <!-- TARJETA -->
+
+        <div
+          *ngIf="metodoPago === 'tarjeta'"
+          class="mt-4">
+
+          <div class="mb-3">
+
+            <label>Número de tarjeta</label>
+
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="numeroTarjeta"
+              maxlength="16"
+              placeholder="0000 0000 0000 0000">
+
+          </div>
+
+
+          <div class="row">
+
+            <div class="col-md-6 mb-3">
+
+              <label>Fecha de vencimiento</label>
+
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="vencimiento"
+                placeholder="MM/AA">
+
+            </div>
+
+
+            <div class="col-md-6 mb-3">
+
+              <label>CVV</label>
+
+              <input
+                type="password"
+                class="form-control"
+                [(ngModel)]="cvv"
+                maxlength="3"
+                placeholder="000">
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- TRANSFERENCIA -->
+
+        <div
+          *ngIf="metodoPago === 'transferencia'"
+          class="mensaje-pago mt-4">
+
+          <i class="bi bi-bank"></i>
+
+          <p>
+            Al confirmar la compra se mostrarán los datos
+            necesarios para realizar la transferencia.
+          </p>
+
+        </div>
+
+
+        <!-- PAYPAL -->
+
+        <div
+          *ngIf="metodoPago === 'paypal'"
+          class="mensaje-pago mt-4">
+
+          <i class="bi bi-paypal"></i>
+
+          <p>
+            Serás dirigido a PayPal para completar el pago.
+            Esta opción está simulada para el proyecto.
+          </p>
+
+        </div>
+
+
+        <!-- RESUMEN -->
+
+        <div class="resumen mt-4">
+
+          <div>
+            <span>Subtotal</span>
+            <strong>${{ subtotal }}</strong>
+          </div>
+
+          <div>
+            <span>IVA</span>
+            <strong>${{ impuestos | number:'1.2-2' }}</strong>
+          </div>
+
+          <div>
+            <span>Envío</span>
+            <strong>${{ envio }}</strong>
+          </div>
+
+          <div *ngIf="descuento > 0">
+
+            <span>Descuento</span>
+
+            <strong>
+              -${{ descuento }}
+            </strong>
+
+          </div>
+
+          <hr>
+
+          <div class="total">
+
+            <span>Total</span>
+
+            <strong>
+              ${{ total | number:'1.2-2' }}
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <div class="botones mt-4">
+
+          <button
+            class="btn btn-outline-secondary"
+            (click)="regresarPaso()">
+
+            <i class="bi bi-arrow-left"></i>
+            Regresar
+
+          </button>
+
+
+          <button
+            class="btn btn-dark"
+            (click)="realizarPago()"
+            [disabled]="procesando">
+
+            <span
+              *ngIf="procesando"
+              class="spinner-border spinner-border-sm me-2">
+            </span>
+
+            {{ procesando ? 'Procesando pago...' : 'Confirmar y pagar' }}
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

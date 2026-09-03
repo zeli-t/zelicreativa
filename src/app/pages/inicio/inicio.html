@@ -1,0 +1,228 @@
+<app-hero></app-hero>
+
+<!-- CATEGORÍAS -->
+
+<section class="container py-5">
+
+  <h2 class="text-center mb-4">
+    Explora nuestras categorías
+  </h2>
+
+  <div class="row g-4">
+
+    <div class="col-6 col-md-4">
+      <app-card-categoria
+        nombre="Libretas"
+        descripcion="Libretas bonitas y personalizadas."
+        imagen="libreta.jpg">
+      </app-card-categoria>
+    </div>
+
+    <div class="col-6 col-md-4">
+      <app-card-categoria
+        nombre="Escritura"
+        descripcion="Plumas y accesorios para escribir."
+        imagen="marcadores2.jpg">
+      </app-card-categoria>
+    </div>
+
+    <div class="col-6 col-md-4">
+      <app-card-categoria
+        nombre="Marcadores"
+        descripcion="Colores y marcadores para tus ideas."
+        imagen="marcadores4.jpg">
+      </app-card-categoria>
+    </div>
+
+    <div class="col-6 col-md-4">
+      <app-card-categoria
+        nombre="Stickers"
+        descripcion="Dale un toque especial a tus proyectos."
+        imagen="stickers.jpg">
+      </app-card-categoria>
+    </div>
+
+    <div class="col-6 col-md-4">
+      <app-card-categoria
+        nombre="Journaling"
+        descripcion="Todo para decorar y organizar tu journal."
+        imagen="kit.jpg">
+      </app-card-categoria>
+    </div>
+
+    <div class="col-6 col-md-4">
+      <app-card-categoria
+        nombre="Kits creativos"
+        descripcion="Kits completos para dejar volar tu creatividad."
+        imagen="azul.jpg">
+      </app-card-categoria>
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- PRODUCTOS -->
+
+<section class="container py-5">
+
+  <h2 class="text-center mb-4">
+    Productos destacados
+  </h2>
+
+
+  <!-- BÚSQUEDA Y FILTROS -->
+
+  <div class="filtros mb-4">
+
+    <div class="row g-3">
+
+      <!-- BUSCAR -->
+
+      <div class="col-md-5">
+
+        <label>Buscar producto</label>
+
+        <div class="input-group">
+
+          <span class="input-group-text">
+            <i class="bi bi-search"></i>
+          </span>
+
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="busqueda"
+            placeholder="Ej. marcadores, libreta...">
+
+        </div>
+
+      </div>
+
+
+      <!-- CATEGORÍA -->
+
+      <div class="col-md-3">
+
+        <label>Categoría</label>
+
+        <select
+          class="form-select"
+          [(ngModel)]="categoriaSeleccionada">
+
+          <option value="Todas">
+            Todas
+          </option>
+
+          <option value="Libretas">
+            Libretas
+          </option>
+
+          <option value="Escritura">
+            Escritura
+          </option>
+
+          <option value="Marcadores">
+            Marcadores
+          </option>
+
+          <option value="Stickers">
+            Stickers
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- PRECIO -->
+
+      <div class="col-md-2">
+
+        <label>Precio máximo</label>
+
+        <input
+          type="number"
+          class="form-control"
+          [(ngModel)]="precioMaximo"
+          min="0">
+
+      </div>
+
+
+      <!-- ORDEN -->
+
+      <div class="col-md-2">
+
+        <label>Ordenar</label>
+
+        <select
+          class="form-select"
+          [(ngModel)]="orden">
+
+          <option value="normal">
+            Normal
+          </option>
+
+          <option value="menor">
+            Menor precio
+          </option>
+
+          <option value="mayor">
+            Mayor precio
+          </option>
+
+          <option value="nombre">
+            Nombre
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- RESULTADOS -->
+
+  <div class="row g-4">
+
+    <div
+      class="col-6 col-md-3"
+      *ngFor="let producto of productosFiltrados">
+
+      <app-card-producto
+        [nombre]="producto.nombre"
+        [precio]="producto.precio"
+        [imagen]="producto.imagen"
+        [oferta]="producto.oferta"
+        [precioAnterior]="producto.precioAnterior">
+      </app-card-producto>
+
+    </div>
+
+  </div>
+
+
+  <!-- SIN RESULTADOS -->
+
+  <div
+    *ngIf="productosFiltrados.length === 0"
+    class="sin-resultados text-center py-5">
+
+    <i class="bi bi-search"></i>
+
+    <h5 class="mt-3">
+      No encontramos productos
+    </h5>
+
+    <p>
+      Intenta con otra búsqueda o cambia los filtros.
+    </p>
+
+  </div>
+
+</section>

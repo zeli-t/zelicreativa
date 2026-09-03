@@ -1,0 +1,185 @@
+.pasos {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+}
+
+.paso {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #777;
+  font-weight: 500;
+}
+
+.paso span {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background-color: #eee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.paso.activo {
+  color: #d94f7d;
+}
+
+.paso.activo span {
+  background-color: rgb(255, 190, 210);
+  color: #333;
+  font-weight: bold;
+}
+
+.card {
+  border: none;
+  border-radius: 15px;
+}
+
+label {
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.cupon {
+  background-color: rgb(255, 239, 190);
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.resumen {
+  background-color: #f8f8f8;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.resumen > div {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.resumen .total {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 0;
+}
+
+.metodos {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.metodo {
+  flex: 1;
+  min-width: 150px;
+  padding: 20px;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.metodo input {
+  margin-right: 8px;
+}
+
+.metodo i {
+  font-size: 20px;
+  margin-right: 5px;
+}
+
+.metodo.seleccionado {
+  border-color: #d94f7d;
+  background-color: rgb(255, 230, 238);
+}
+
+.mensaje-pago {
+  text-align: center;
+  padding: 25px;
+  background-color: #f8f8f8;
+  border-radius: 10px;
+}
+
+.mensaje-pago i {
+  font-size: 40px;
+  color: #d94f7d;
+}
+
+.botones {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.botones .btn-dark {
+  flex: 1;
+}
+
+
+/* =========================
+   DISEÑO PARA CELULAR
+   ========================= */
+
+@media (max-width: 576px) {
+
+  .pasos {
+    gap: 10px;
+    font-size: 13px;
+    justify-content: space-between;
+  }
+
+  .paso {
+    gap: 5px;
+  }
+
+  .paso span {
+    width: 30px;
+    height: 30px;
+  }
+
+  .cupon {
+    padding: 12px;
+  }
+
+  .cupon .d-flex {
+    flex-direction: column;
+  }
+
+  .cupon .btn {
+    width: 100%;
+  }
+
+  .resumen {
+    padding: 15px;
+  }
+
+  .resumen .total {
+    font-size: 19px;
+  }
+
+  .metodos {
+    flex-direction: column;
+  }
+
+  .metodo {
+    width: 100%;
+    min-width: 0;
+    padding: 15px;
+  }
+
+  .mensaje-pago {
+    padding: 20px 15px;
+  }
+
+  .botones {
+    flex-direction: column;
+  }
+
+  .botones .btn {
+    width: 100%;
+  }
+
+}

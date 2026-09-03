@@ -1,0 +1,122 @@
+<div class="carrito-lateral">
+
+  <div class="carrito-header">
+
+    <h4>
+      <i class="bi bi-cart3"></i>
+      Mi carrito
+    </h4>
+
+    <button
+      class="btn btn-sm"
+      type="button"
+      (click)="cerrarCarrito()">
+
+      <i class="bi bi-x-lg"></i>
+
+    </button>
+
+  </div>
+
+  <!-- Carrito vacío -->
+
+  <div
+    class="carrito-vacio"
+    *ngIf="productos.length === 0">
+
+    <i class="bi bi-cart-x"></i>
+
+    <h5>Tu carrito está vacío</h5>
+
+    <p>
+      Agrega algunos productos para comenzar tu compra.
+    </p>
+
+  </div>
+
+
+  <!-- Productos -->
+
+  <div
+    class="productos-carrito"
+    *ngIf="productos.length > 0">
+
+    <div
+      class="producto-carrito"
+      *ngFor="let producto of productos">
+
+      <img
+        [src]="producto.imagen"
+        [alt]="producto.nombre">
+
+      <div class="producto-info">
+
+        <h6>{{ producto.nombre }}</h6>
+
+        <p>${{ producto.precio }}</p>
+
+        <div class="cantidad">
+
+          <button
+            class="btn btn-sm btn-outline-secondary"
+            (click)="disminuirCantidad(producto.nombre)">
+
+            −
+
+          </button>
+
+          <span>
+            {{ producto.cantidad }}
+          </span>
+
+          <button
+            class="btn btn-sm btn-outline-secondary"
+            (click)="aumentarCantidad(producto.nombre)">
+
+            +
+
+          </button>
+
+        </div>
+
+      </div>
+
+      <button
+        class="btn btn-sm btn-link text-danger"
+        (click)="eliminarProducto(producto.nombre)">
+
+        <i class="bi bi-trash"></i>
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- Total -->
+
+  <div
+    class="carrito-total"
+    *ngIf="productos.length > 0">
+
+    <div class="d-flex justify-content-between">
+
+      <strong>Subtotal:</strong>
+
+      <strong>
+        ${{ subtotal }}
+      </strong>
+
+    </div>
+<a
+  routerLink="/carrito"
+  class="btn btn-dark w-100 mt-3">
+
+  Ver carrito
+
+</a>
+
+  </div>
+
+</div>

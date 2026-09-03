@@ -1,0 +1,83 @@
+.sin-favoritos i {
+  font-size: 70px;
+  color: #d94f7d;
+}
+
+.sin-favoritos h4 {
+  font-weight: bold;
+}
+
+.sin-favoritos p {
+  color: #777;
+}
+
+.favorito-card {
+  border: none;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.favorito-card img {
+  height: 220px;
+  object-fit: cover;
+}
+
+.favorito-card:hover {
+  transform: translateY(-5px);
+}
+
+.card-title {
+  font-weight: bold;
+}
+
+.precio {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+
+/* =========================
+   DISEÑO PARA CELULAR
+   ========================= */
+
+@media (max-width: 576px) {
+
+  .sin-favoritos {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .sin-favoritos i {
+    font-size: 55px;
+  }
+
+  .sin-favoritos h4 {
+    font-size: 20px;
+  }
+
+  .sin-favoritos p {
+    font-size: 14px;
+  }
+
+  .favorito-card img {
+    height: 160px;
+  }
+
+  .favorito-card .card-body {
+    padding: 12px;
+  }
+
+  .favorito-card .card-title {
+    font-size: 15px;
+  }
+
+  .precio {
+    font-size: 17px;
+  }
+
+  .favorito-card .btn {
+    font-size: 12px;
+    padding: 7px 5px;
+  }
+
+}

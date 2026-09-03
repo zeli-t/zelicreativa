@@ -1,0 +1,44 @@
+.filtros {
+  background-color: rgb(255, 230, 238);
+  padding: 20px;
+  border-radius: 15px;
+}
+
+.filtros label {
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.sin-resultados {
+  color: #777;
+}
+
+.sin-resultados i {
+  font-size: 50px;
+  color: #d94f7d;
+}
+
+
+/* =========================
+   DISEÑO PARA CELULAR
+   ========================= */
+
+@media (max-width: 576px) {
+
+  .filtros {
+    padding: 15px;
+  }
+
+  .filtros label {
+    font-size: 14px;
+  }
+
+  .sin-resultados {
+    padding: 30px 15px !important;
+  }
+
+  .sin-resultados i {
+    font-size: 40px;
+  }
+
+}

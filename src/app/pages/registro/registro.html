@@ -1,0 +1,113 @@
+<div class="container py-5">
+
+  <div class="row justify-content-center">
+
+    <div class="col-md-6">
+
+      <div class="card p-4 shadow-sm">
+
+        <h2 class="text-center mb-4">
+          Crear cuenta 💕
+        </h2>
+
+        <label>Nombre</label>
+
+        <input
+          type="text"
+          class="form-control mb-3"
+          [class.is-invalid]="enviado && !nombre"
+          [class.is-valid]="nombre"
+          placeholder="Nombre"
+          [(ngModel)]="nombre">
+
+        <div
+          class="invalid-feedback"
+          *ngIf="enviado && !nombre">
+
+          El nombre es obligatorio.
+
+        </div>
+
+
+        <label>Correo electrónico</label>
+
+        <input
+          type="email"
+          class="form-control mb-3"
+          [class.is-invalid]="enviado && !correo"
+          [class.is-valid]="correo"
+          placeholder="Correo electrónico"
+          [(ngModel)]="correo">
+
+        <div
+          class="invalid-feedback"
+          *ngIf="enviado && !correo">
+
+          El correo es obligatorio.
+
+        </div>
+
+
+        <label>Contraseña</label>
+
+        <input
+          type="password"
+          class="form-control mb-3"
+          [class.is-invalid]="enviado && password.length < 6"
+          [class.is-valid]="password.length >= 6"
+          placeholder="Mínimo 6 caracteres"
+          [(ngModel)]="password">
+
+        <div
+          class="invalid-feedback"
+          *ngIf="enviado && password.length < 6">
+
+          La contraseña debe tener mínimo 6 caracteres.
+
+        </div>
+
+
+        <label>Confirmar contraseña</label>
+
+        <input
+          type="password"
+          class="form-control mb-3"
+          [class.is-invalid]="enviado && confirmarPassword !== password"
+          [class.is-valid]="confirmarPassword && confirmarPassword === password"
+          placeholder="Confirmar contraseña"
+          [(ngModel)]="confirmarPassword">
+
+        <div
+          class="invalid-feedback"
+          *ngIf="enviado && confirmarPassword !== password">
+
+          Las contraseñas no coinciden.
+
+        </div>
+
+
+        <button
+          class="btn btn-dark w-100"
+          (click)="registrar()">
+
+          Crear cuenta
+
+        </button>
+
+        <p class="text-center mt-3">
+
+          ¿Ya tienes cuenta?
+
+          <a routerLink="/iniciar-sesion">
+            Inicia sesión
+          </a>
+
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
