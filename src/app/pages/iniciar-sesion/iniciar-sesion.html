@@ -7,28 +7,58 @@
       <div class="card p-4 shadow-sm">
 
         <h2 class="text-center mb-4">
-          Iniciar sesión
+          {{ auth.sesion() ? 'Mi cuenta' : 'Iniciar sesión' }}
         </h2>
 
+        @if (auth.sesion(); as sesion) {
+          <p class="text-center">{{ sesion.user.email }}</p>
+          @if (volverAlCheckout) {
+            <button type="button" class="btn btn-dark w-100 mb-3" [disabled]="cierreSesion.pendiente()" (click)="continuar()">Continuar con la compra</button>
+          }
+          <button type="button" class="btn btn-dark w-100" [disabled]="cierreSesion.pendiente()"
+            [attr.aria-busy]="cierreSesion.pendiente()" (click)="cierreSesion.salir()">
+            @if (cierreSesion.pendiente()) { <span class="spinner-border spinner-border-sm cargando-cierre me-1" aria-hidden="true"></span> }
+            {{ cierreSesion.pendiente() ? 'Cerrando sesión…' : 'Cerrar sesión' }}
+          </button>
+        } @else {
+        @if (volverAlCheckout) {
+          <p role="status">Inicia sesión para continuar con la compra. Tu carrito se conserva.</p>
+        }
+        @if (enlaceInvalido) {
+          <p role="alert" class="text-danger">El enlace de confirmación es inválido o caducó.</p>
+        }
+        <form (ngSubmit)="iniciarSesion()" novalidate>
         <input
           type="email"
+          name="correo"
+          aria-label="Correo electrónico"
+          autocomplete="username"
           class="form-control mb-3"
           placeholder="Correo electrónico"
           [(ngModel)]="correo">
 
         <input
           type="password"
+          name="password"
+          aria-label="Contraseña"
+          autocomplete="current-password"
           class="form-control mb-3"
           placeholder="Contraseña"
           [(ngModel)]="password">
 
         <button
           class="btn btn-dark w-100"
-          (click)="iniciarSesion()">
+          type="submit"
+          [disabled]="pendiente()">
 
-          Iniciar sesión
+          {{ pendiente() ? 'Iniciando sesión…' : 'Iniciar sesión' }}
 
         </button>
+        </form>
+
+        <p class="text-center mt-3 mb-0">
+          <a routerLink="/recuperar-contrasena">¿Olvidaste tu contraseña?</a>
+        </p>
 
         <p class="text-center mt-3">
           ¿No tienes cuenta?
@@ -36,6 +66,8 @@
             Crear cuenta
           </a>
         </p>
+        }
+        @if (error()) { <p class="text-danger mt-3 mb-0" role="alert">{{ error() }}</p> }
 
       </div>
 

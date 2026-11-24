@@ -1,4 +1,5 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+﻿import { Component, EventEmitter, Output, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { Carrito } from '../../services/carrito';
 
 @Component({
@@ -7,41 +8,15 @@ import { Carrito } from '../../services/carrito';
   styleUrl: './carrito-lateral.css',
   templateUrl: './carrito-lateral.html',
 })
-export class CarritoLateral implements OnInit {
-
+export class CarritoLateral {
   @Output() cerrar = new EventEmitter<void>();
 
-  productos: any[] = [];
-  subtotal = 0;
+  readonly carrito = inject(Carrito);
+  private readonly partidas = toSignal(this.carrito.carrito$, { requireSync: true });
+  get productos() { return this.partidas(); }
+  get subtotal() { return this.carrito.obtenerSubtotal(); }
 
-  constructor(private carrito: Carrito) {}
-
-  ngOnInit() {
-
-    this.carrito.carrito$.subscribe(productos => {
-
-      this.productos = productos;
-
-      this.subtotal = this.carrito.obtenerSubtotal();
-
-    });
-
-  }
-
-  cerrarCarrito() {
+  cerrarCarrito(): void {
     this.cerrar.emit();
   }
-
-  aumentarCantidad(nombre: string) {
-    this.carrito.aumentarCantidad(nombre);
-  }
-
-  disminuirCantidad(nombre: string) {
-    this.carrito.disminuirCantidad(nombre);
-  }
-
-  eliminarProducto(nombre: string) {
-    this.carrito.eliminarProducto(nombre);
-  }
-
 }

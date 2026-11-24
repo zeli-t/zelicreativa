@@ -1,0 +1,396 @@
+<main class="admin container py-4 py-lg-5">
+  @if (!api.esAdmin()) {
+    <section class="panel">
+      <h1>Acceso a Administración</h1>
+      <p role="alert">Tu sesión ya no tiene acceso al panel.</p>
+      <a class="btn btn-outline-dark" routerLink="/inicio">Volver a la tienda</a>
+    </section>
+  } @else {
+    <header class="admin-portada">
+      <img src="zc.png" alt="Zeli Creativa" width="126" height="48">
+      <h1>Administración</h1>
+      <a routerLink="/inicio" class="zeli-link">Volver a la tienda</a>
+    </header>
+    <nav aria-label="Secciones administrativas" class="admin-menu">
+      @for (item of menu; track item.id) {
+        <button type="button" [class.activo]="seccion() === item.id" [attr.aria-pressed]="seccion() === item.id"
+          [disabled]="ocupado()" (click)="ir(item.id)">
+          <i class="bi" [ngClass]="item.icono" aria-hidden="true"></i> {{ item.nombre }}
+        </button>
+      }
+    </nav>
+    <div class="admin-estado">
+      @if (ocupado()) { <p role="status"><span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Procesando…</p> }
+      @if (exito()) { <p role="status" class="text-success">{{ exito() }}</p> }
+      @if (error()) { <p role="alert" class="text-danger">{{ error() }}</p> }
+    </div>
+    <div class="seccion-titulo">
+      @for (item of menu; track item.id) {
+        @if (item.id === seccion()) { <h2>{{ item.nombre }}</h2> }
+      }
+      <button type="button" class="btn btn-outline-dark" [disabled]="ocupado()" (click)="actualizar()">
+        <i class="bi bi-arrow-clockwise" aria-hidden="true"></i> Actualizar
+      </button>
+    </div>
+
+    @switch (seccion()) {
+      @case ('inicio') {
+        @let cifras = indicadores();
+        <section class="indicadores" aria-label="Indicadores de la tienda">
+          <div class="indicador"><i class="bi bi-bag-check" aria-hidden="true"></i><span>Pedidos</span><strong>{{ cifras.pedidos }}</strong></div>
+          <div class="indicador"><i class="bi bi-receipt" aria-hidden="true"></i><span>Ventas simuladas netas</span><strong>{{ cifras.ventas | currency:'MXN':'code' }}</strong><small>Pagos aprobados menos reembolsos</small></div>
+          <div class="indicador"><i class="bi bi-box-seam" aria-hidden="true"></i><span>Productos activos</span><strong>{{ cifras.productos }}</strong>
+            @if (cifras.productosPrueba) { <small>Incluye {{ cifras.productosPrueba }} de pruebas de checkout</small> }
+          </div>
+          <div class="indicador"><i class="bi bi-boxes" aria-hidden="true"></i><span>Unidades en inventario</span><strong>{{ cifras.existencias }}</strong><small>{{ cifras.stockBajo }} variantes en su mínimo o por debajo</small></div>
+        </section>
+        <div class="admin-columnas mt-3">
+          <section class="panel">
+            <h3>Productos más vendidos</h3>
+            <ol class="list-group list-group-numbered">
+              @for (producto of masVendidos(); track producto.nombre) {
+                <li class="list-group-item">{{ producto.nombre }} <strong class="float-end">{{ producto.cantidad }}</strong></li>
+              } @empty { <p class="mb-0">Todavía no hay ventas registradas.</p> }
+            </ol>
+          </section>
+          <section class="panel">
+            <h3>Operación de la tienda</h3>
+            <p>{{ cifras.devoluciones }} solicitudes de devolución registradas.</p>
+            <button type="button" class="btn btn-dark" [disabled]="ocupado()" (click)="ir('pedidos')">Consultar pedidos</button>
+          </section>
+        </div>
+      }
+      @case ('pedidos') {
+        <section class="panel">
+          <label for="filtro-pedidos">Buscar por folio, cliente o estado</label>
+          <input id="filtro-pedidos" type="search" class="form-control filtro my-2" [ngModel]="filtro()" (ngModelChange)="filtro.set($event)">
+          <div class="table-responsive">
+            <table class="table align-middle">
+              <thead><tr><th>Folio</th><th>Fecha</th><th>Cliente</th><th>Total</th><th>Estado</th><th>Detalle</th></tr></thead>
+              <tbody>
+                @for (pedido of pedidosVisibles(); track pedido.id) {
+                  <tr>
+                    <td class="folio">{{ pedido.folio }}</td><td>{{ pedido.creado_en | date:'dd/MM/yyyy HH:mm' }}</td>
+                    <td>{{ nombreComprador(pedido.cliente, pedido.destinatario) }}</td><td>{{ pedido.total | currency:'MXN':'code' }}</td>
+                    <td><span class="estado">{{ pedido.estado | titlecase }}</span></td>
+                    <td><button type="button" class="btn btn-sm btn-outline-dark" [disabled]="ocupado()"
+                      [attr.aria-label]="'Ver pedido ' + pedido.folio" (click)="verPedido(pedido.id)">Ver</button></td>
+                  </tr>
+                } @empty { <tr><td colspan="6">{{ ocupado() ? 'Consultando pedidos…' : 'No se encontraron pedidos.' }}</td></tr> }
+              </tbody>
+            </table>
+          </div>
+        </section>
+        @if (detalle(); as pedido) {
+          <section class="panel mt-3" id="detalle-admin-pedido" tabindex="-1" aria-label="Detalle del pedido">
+            <div class="seccion-titulo">
+              <div><h3>Detalle del pedido</h3><p class="folio mb-0">{{ pedido.folio }}</p></div>
+              <button type="button" class="btn btn-outline-dark" [disabled]="ocupado()" (click)="detalle.set(null)">Cerrar detalle</button>
+            </div>
+            <div class="admin-columnas">
+              <div>
+                <p><strong>Cliente:</strong> {{ nombreComprador(pedido.cliente, pedido.direccion_entrega.destinatario) }}<br>
+                  <strong>Estado:</strong> {{ pedido.estado | titlecase }}<br>
+                  <strong>Contacto:</strong> {{ pedido.contacto_entrega?.correo || '—' }} · {{ pedido.contacto_entrega?.telefono || '—' }}</p>
+                @if (pedido.direccion_entrega; as direccion) {
+                  <p><strong>Entrega:</strong> {{ direccion.destinatario }} · {{ direccion.calle }} {{ direccion.numero }},
+                    {{ direccion.colonia }}, {{ direccion.ciudad }}, {{ direccion.estado }} {{ direccion.codigo_postal }}</p>
+                }
+                @if (pedido.envios; as envio) {
+                  <p><strong>Envío:</strong> {{ envio.empresa?.nombre }} · {{ envio.numero_guia }} · {{ envio.estado | titlecase }}</p>
+                }
+              </div>
+              <dl class="importes">
+                <dt>Subtotal</dt><dd>{{ pedido.subtotal | currency:'MXN':'code' }}</dd>
+                <dt>IVA</dt><dd>{{ pedido.iva | currency:'MXN':'code' }}</dd>
+                <dt>Descuento</dt><dd>{{ pedido.descuento | currency:'MXN':'code' }}</dd>
+                <dt>Envío</dt><dd>{{ pedido.envio | currency:'MXN':'code' }}</dd>
+                <dt>Total</dt><dd><strong>{{ pedido.total | currency:'MXN':'code' }}</strong></dd>
+              </dl>
+            </div>
+            <div class="table-responsive">
+              <table class="table">
+                <thead><tr><th>Producto</th><th>Variante</th><th>SKU</th><th>Cantidad</th><th>Unitario</th><th>Importe</th></tr></thead>
+                <tbody>@for (p of pedido.detalle_pedido; track p.id) {
+                  <tr><td>{{ p.nombre_producto }}</td><td>{{ p.nombre_variante }}</td><td>{{ p.sku }}</td><td>{{ p.cantidad }}</td>
+                    <td>{{ p.precio_unitario | currency:'MXN':'code' }}</td><td>{{ p.subtotal | currency:'MXN':'code' }}</td></tr>
+                }</tbody>
+              </table>
+            </div>
+            <div class="admin-columnas">
+              <div>
+                <h4>Pagos</h4>
+                <ul>@for (pago of pedido.pagos; track pago.id) {
+                  <li>{{ pago.metodo | titlecase }} · {{ pago.estado | titlecase }} · {{ pago.monto | currency:'MXN':'code' }}</li>
+                } @empty { <li>Sin pagos registrados.</li> }</ul>
+                <h4>Historial de estados</h4>
+                <ul>@for (evento of pedido.historial_estados_pedido; track evento.id) {
+                  <li>{{ evento.creado_en | date:'dd/MM/yyyy HH:mm' }} · {{ evento.estado_nuevo | titlecase }} · {{ evento.motivo }}</li>
+                } @empty { <li>Sin cambios registrados.</li> }</ul>
+              </div>
+              @if (estados().length) {
+                <form #formEstado="ngForm" (ngSubmit)="guardarEstado()" class="subpanel">
+                  <h4>Actualizar estado</h4>
+                  <fieldset [disabled]="ocupado()">
+                    <label for="destino-estado">Nuevo estado</label>
+                    <select id="destino-estado" name="estado" class="form-select mb-2" [(ngModel)]="estado" required>
+                      <option value="">Selecciona un estado</option>
+                      @for (opcion of estados(); track opcion) { <option [value]="opcion">{{ opcion | titlecase }}</option> }
+                    </select>
+                    <label for="motivo-estado">Motivo</label>
+                    <textarea id="motivo-estado" name="motivo" class="form-control mb-2" [(ngModel)]="motivo" maxlength="500" required></textarea>
+                    @if (estado === 'enviado') {
+                      <label for="pedido-empresa">Paquetería</label>
+                      <select id="pedido-empresa" name="empresa" class="form-select mb-2" [(ngModel)]="empresa" required>
+                        <option [ngValue]="null">Selecciona una paquetería</option>
+                        @for (opcion of paqueterias(); track opcion.id) { <option [ngValue]="opcion.id">{{ opcion.nombre }}</option> }
+                      </select>
+                      <label for="pedido-guia">Guía</label>
+                      <input id="pedido-guia" name="guia" class="form-control mb-2" [(ngModel)]="guia" maxlength="100" required>
+                    }
+                    <button type="submit" class="btn btn-dark" [disabled]="formEstado.invalid || !motivo.trim()">Guardar estado</button>
+                  </fieldset>
+                </form>
+              } @else { <p>El pedido no admite más cambios de estado.</p> }
+            </div>
+          </section>
+        }
+      }
+      @case ('catalogo') {
+        <div class="admin-columnas">
+          <section class="panel">
+            <div class="seccion-titulo"><h3>Categorías</h3><button class="btn btn-dark" type="button" [disabled]="ocupado()" (click)="editarCategoria()">Nueva categoría</button></div>
+            <ul class="list-group list-group-flush">
+              @for (c of categorias(); track c.id) {
+                <li class="list-group-item px-0">
+                  <strong>{{ c.nombre }}</strong> <span class="estado">{{ c.activa ? 'Activa' : 'Inactiva' }}</span>
+                  <p class="small mb-1">{{ c.slug }} @if (c.descripcion) { · {{ c.descripcion }} }</p>
+                  <div class="acciones-admin">
+                    <button class="btn btn-sm btn-outline-dark" type="button" [disabled]="ocupado()" (click)="editarCategoria(c)">Editar</button>
+                    <button class="btn btn-sm btn-outline-dark" type="button" [disabled]="ocupado()"
+                      (click)="cambiarVigencia('categorias', c.id, !c.activa)">{{ c.activa ? 'Desactivar' : 'Activar' }}</button>
+                  </div>
+                </li>
+              } @empty { <li class="list-group-item">No hay categorías.</li> }
+            </ul>
+          </section>
+          <section class="panel">
+            <div class="seccion-titulo"><h3>Productos</h3><button class="btn btn-dark" type="button" [disabled]="ocupado() || !categorias().length" (click)="editarProducto()">Nuevo producto</button></div>
+            <div class="list-group list-group-flush">
+              @for (p of productos(); track p.id) {
+                <details class="list-group-item px-0">
+                  <summary><strong>{{ p.nombre }}</strong> · {{ p.precio | currency:'MXN':'code' }}
+                    <span class="estado">{{ p.activo ? 'Activo' : 'Inactivo' }}</span>
+                    @if (origenPrueba(p); as origen) { <span class="estado">{{ origen }}</span> }
+                  </summary>
+                  <p class="small mt-2 mb-1">{{ nombresCategoria().get(p.categoria_id) }} · {{ p.slug }}</p>
+                  <p>{{ p.descripcion }}</p>
+                  <div class="acciones-admin">
+                    <button class="btn btn-sm btn-outline-dark" type="button" [disabled]="ocupado()" (click)="editarProducto(p)">Editar producto</button>
+                    <button class="btn btn-sm btn-outline-dark" type="button" [disabled]="ocupado()" (click)="cambiarVigencia('productos', p.id, !p.activo)">{{ p.activo ? 'Desactivar' : 'Activar' }}</button>
+                    <button class="btn btn-sm btn-outline-dark" type="button" [disabled]="ocupado()" (click)="editarVariante(p)">Agregar variante</button>
+                  </div>
+                  <ul class="list-unstyled mt-2 mb-0">
+                    @for (v of variantes(); track v.id) {
+                      @if (v.producto_id === p.id) {
+                        <li class="py-1">
+                          {{ v.nombre }} · {{ v.sku }} · {{ v.activa ? 'Activa' : 'Inactiva' }}
+                          <button class="btn btn-sm btn-link" type="button" [disabled]="ocupado()" (click)="editarVariante(p, v)">Editar variante</button>
+                          <button class="btn btn-sm btn-link" type="button" [disabled]="ocupado()" (click)="cambiarVigencia('variantes_producto', v.id, !v.activa)">{{ v.activa ? 'Desactivar' : 'Activar' }}</button>
+                        </li>
+                      }
+                    }
+                  </ul>
+                </details>
+              } @empty { <p>No hay productos.</p> }
+            </div>
+          </section>
+        </div>
+        @if (categoria; as c) {
+          <form class="panel mt-3" id="editar-admin-categoria" tabindex="-1" #formCategoria="ngForm" (ngSubmit)="guardarCategoria()">
+            <h3>{{ c.id ? 'Editar categoría' : 'Nueva categoría' }}</h3>
+            <fieldset class="campos" [disabled]="ocupado()">
+              <label>Nombre <input name="nombre" class="form-control" [(ngModel)]="c.nombre" required></label>
+              <label>Identificador URL <input name="slug" class="form-control" [(ngModel)]="c.slug" pattern="[a-z0-9]+(-[a-z0-9]+)*" required></label>
+              <label class="ancho-completo">Descripción <textarea name="descripcion" class="form-control" [(ngModel)]="c.descripcion"></textarea></label>
+              <div class="acciones-admin"><button class="btn btn-dark" type="submit" [disabled]="formCategoria.invalid">Guardar categoría</button>
+                <button class="btn btn-outline-dark" type="button" (click)="categoria = null">Cerrar</button></div>
+            </fieldset>
+          </form>
+        }
+        @if (producto; as p) {
+          <form class="panel mt-3" id="editar-admin-producto" tabindex="-1" #formProducto="ngForm" (ngSubmit)="guardarProducto()">
+            <h3>{{ p.id ? 'Editar producto' : 'Nuevo producto' }}</h3>
+            <fieldset class="campos" [disabled]="ocupado()">
+              <label>Nombre <input name="nombre" class="form-control" [(ngModel)]="p.nombre" required></label>
+              <label>Identificador URL <input name="slug" class="form-control" [(ngModel)]="p.slug" pattern="[a-z0-9]+(-[a-z0-9]+)*" required></label>
+              <label>Categoría <select name="categoria" class="form-select" [(ngModel)]="p.categoria_id" required>
+                @for (c of categorias(); track c.id) { <option [ngValue]="c.id">{{ c.nombre }}{{ c.activa ? '' : ' (inactiva)' }}</option> }
+              </select></label>
+              <label>Precio (MXN) <input type="number" min="0" step=".01" class="form-control" name="precio" [(ngModel)]="p.precio" required></label>
+              <label>Precio anterior (MXN) <input type="number" min="0" step=".01" class="form-control" name="anterior" [(ngModel)]="p.precio_anterior"></label>
+              <label class="ancho-completo">Descripción <textarea name="descripcion" class="form-control" [(ngModel)]="p.descripcion" required></textarea></label>
+              <div class="acciones-admin"><button class="btn btn-dark" type="submit" [disabled]="formProducto.invalid">Guardar producto</button>
+                <button class="btn btn-outline-dark" type="button" (click)="producto = null">Cerrar</button></div>
+            </fieldset>
+          </form>
+        }
+        @if (variante; as v) {
+          <form class="panel mt-3" id="editar-admin-variante" tabindex="-1" #formVariante="ngForm" (ngSubmit)="guardarVariante()">
+            <h3>{{ v.id ? 'Editar variante' : 'Nueva variante' }} · {{ nombresProducto().get(v.producto_id) }}</h3>
+            <fieldset class="campos" [disabled]="ocupado()">
+              <label>Nombre <input name="nombre" class="form-control" [(ngModel)]="v.nombre" required></label>
+              <label>SKU <input name="sku" class="form-control" [(ngModel)]="v.sku" required></label>
+              <label>Precio adicional (MXN) <input name="precio" type="number" min="0" step=".01" class="form-control" [(ngModel)]="v.precio_adicional" required></label>
+              <label class="form-check align-self-center"><input type="checkbox" name="predeterminada" class="form-check-input" [(ngModel)]="v.predeterminada"> Predeterminada</label>
+              <div class="acciones-admin"><button class="btn btn-dark" type="submit" [disabled]="formVariante.invalid">Guardar variante</button>
+                <button class="btn btn-outline-dark" type="button" (click)="variante = null">Cerrar</button></div>
+            </fieldset>
+          </form>
+        }
+      }
+      @case ('inventario') {
+        <section class="panel table-responsive">
+          <label class="form-check mb-3">
+            <input type="checkbox" class="form-check-input" [ngModel]="soloStockBajo()" (ngModelChange)="soloStockBajo.set($event)">
+            Solo variantes activas con stock bajo o sin registro
+          </label>
+          <table class="table align-middle">
+            <thead><tr><th>Producto</th><th>Variante</th><th>SKU</th><th>Existencias</th><th>Mínimo</th><th>Operación</th></tr></thead>
+            <tbody>@for (v of inventarioVisible(); track v.id) {
+              @let stock = inventarioPorVariante().get(v.id);
+              <tr><td>{{ nombresProducto().get(v.producto_id) }}</td><td>{{ v.nombre }}{{ v.activa ? '' : ' (inactiva)' }}</td><td>{{ v.sku }}</td>
+                <td>
+                  @if (!stock) { <span class="estado">Sin registro</span> }
+                  @else {
+                    {{ stock.cantidad }}
+                    @if (stock.cantidad === 0) { <span class="estado">Agotado</span> }
+                    @else if (stockBajo(stock)) { <span class="estado">Stock bajo</span> }
+                  }
+                </td>
+                <td>{{ stock?.stock_minimo ?? '—' }}</td>
+                <td><button class="btn btn-sm btn-outline-dark" type="button" [disabled]="ocupado()" (click)="verInventario(v)">Movimientos y ajuste</button></td></tr>
+            } @empty { <tr><td colspan="6">{{ soloStockBajo() ? 'No hay variantes activas con alertas de stock.' : 'No hay variantes.' }}</td></tr> }</tbody>
+          </table>
+        </section>
+        @if (varianteAbierta(); as v) {
+          <section class="panel mt-3" id="detalle-admin-inventario" tabindex="-1">
+            <h3>{{ v.nombre }} · {{ v.sku }}</h3>
+            <form #formStock="ngForm" (ngSubmit)="ajustar()" class="subpanel mb-3">
+              <h4>Ajustar existencias</h4>
+              <fieldset class="campos" [disabled]="ocupado()">
+                <label>Unidades a sumar o restar <input name="delta" type="number" step="1" class="form-control" [(ngModel)]="delta"></label>
+                <label>Nuevo mínimo, opcional <input name="minimo" type="number" min="0" step="1" class="form-control" [(ngModel)]="minimo"></label>
+                <label class="ancho-completo">Motivo <input name="motivo" class="form-control" maxlength="500" [(ngModel)]="motivoStock" required></label>
+                <button type="submit" class="btn btn-dark" [disabled]="formStock.invalid">Registrar ajuste</button>
+              </fieldset>
+            </form>
+            <h4>Últimos 30 movimientos</h4>
+            <div class="table-responsive">
+              <table class="table align-middle">
+                <thead><tr><th>Fecha</th><th>Tipo</th><th>Variación</th><th>Saldo</th><th>Motivo</th><th>Pedido</th></tr></thead>
+                <tbody>@for (m of movimientos(); track m.id) {
+                  <tr><td>{{ m.creado_en | date:'dd/MM/yyyy HH:mm' }}</td><td>{{ m.tipo | titlecase }}</td>
+                    <td>{{ m.variacion }}</td><td>{{ m.saldo }}</td><td>{{ m.motivo }}</td><td>{{ m.pedido_id ?? '—' }}</td></tr>
+                } @empty { <tr><td colspan="6">Sin movimientos registrados.</td></tr> }</tbody>
+              </table>
+            </div>
+          </section>
+        }
+      }
+      @case ('clientes') {
+        <section class="panel table-responsive">
+          <table class="table align-middle">
+            <thead><tr><th>Nombre</th><th>Teléfono de perfil</th><th>Registro</th><th>Rol</th><th>Cuenta</th><th>Permiso</th></tr></thead>
+            <tbody>@for (c of clientes(); track c.id) {
+              <tr><td>{{ c.nombre }}</td><td>{{ c.telefono || '—' }}</td><td>{{ c.creado_en | date:'dd/MM/yyyy' }}</td>
+                <td>{{ c.rol }}</td><td>{{ c.activo ? 'Activa' : 'Inactiva' }}</td>
+                <td>@if (c.id === usuario()) { Tu cuenta } @else {
+                  <button class="btn btn-sm btn-outline-dark" type="button" [disabled]="ocupado()" (click)="asignarRol(c)">{{ c.rol === 'admin' ? 'Cambiar a cliente' : 'Cambiar a admin' }}</button>
+                }</td></tr>
+            } @empty { <tr><td colspan="6">No se encontraron cuentas.</td></tr> }</tbody>
+          </table>
+        </section>
+      }
+      @case ('promociones') {
+        <section class="panel">
+          <button class="btn btn-dark mb-3" type="button" [disabled]="ocupado()" (click)="editarCupon()">Nuevo cupón</button>
+          <div class="table-responsive">
+            <table class="table align-middle">
+              <thead><tr><th>Código</th><th>Valor</th><th>Vigencia</th><th>Límite</th><th>Estado</th><th>Acciones</th></tr></thead>
+              <tbody>@for (c of cupones(); track c.id) {
+                <tr><td><strong>{{ c.codigo }}</strong> @if (c.descripcion) { <div class="small">{{ c.descripcion }}</div> }</td>
+                  <td>{{ c.tipo === 'porcentaje' ? c.valor + '%' : (c.valor | currency:'MXN':'code') }}</td>
+                  <td>{{ c.inicio | date:'dd/MM/yyyy HH:mm' }} – {{ c.fin ? (c.fin | date:'dd/MM/yyyy HH:mm') : 'Sin vencimiento' }}</td>
+                  <td>{{ c.limite_usos ?? 'Sin límite' }}</td><td>{{ c.activo ? 'Habilitado' : 'Deshabilitado' }}</td>
+                  <td><div class="acciones-admin">
+                    <button class="btn btn-sm btn-outline-dark" type="button" [disabled]="ocupado()" (click)="editarCupon(c)">Editar</button>
+                    <button class="btn btn-sm btn-outline-dark" type="button" [disabled]="ocupado()" (click)="cambiarVigencia('cupones', c.id, !c.activo)">{{ c.activo ? 'Desactivar' : 'Activar' }}</button>
+                  </div></td></tr>
+              } @empty { <tr><td colspan="6">No hay cupones.</td></tr> }</tbody>
+            </table>
+          </div>
+        </section>
+        @if (cupon; as c) {
+          <form class="panel mt-3" id="editar-admin-cupon" tabindex="-1" #formCupon="ngForm" (ngSubmit)="guardarCupon()">
+            <h3>{{ c.id ? 'Editar cupón' : 'Nuevo cupón' }}</h3>
+            <fieldset class="campos" [disabled]="ocupado()">
+              <label>Código <input name="codigo" class="form-control" [(ngModel)]="c.codigo" required></label>
+              <label>Tipo <select name="tipo" class="form-select" [(ngModel)]="c.tipo">
+                <option value="fijo">Importe fijo (MXN)</option><option value="porcentaje">Porcentaje</option>
+              </select></label>
+              <label>Valor <input name="valor" type="number" min=".01" step=".01" class="form-control" [(ngModel)]="c.valor" required></label>
+              <label>Límite de usos <input name="limite" type="number" min="1" step="1" class="form-control" [(ngModel)]="c.limite_usos"></label>
+              <label>Inicio, hora local <input name="inicio" type="datetime-local" step="1" class="form-control" [(ngModel)]="c.inicio" required></label>
+              <label>Fin, hora local <input name="fin" type="datetime-local" step="1" class="form-control" [(ngModel)]="c.fin"></label>
+              <label class="ancho-completo">Descripción <textarea name="descripcion" class="form-control" [(ngModel)]="c.descripcion"></textarea></label>
+              <div class="acciones-admin"><button class="btn btn-dark" type="submit" [disabled]="formCupon.invalid">Guardar cupón</button>
+                <button class="btn btn-outline-dark" type="button" (click)="cupon = null">Cerrar</button></div>
+            </fieldset>
+          </form>
+        }
+      }
+      @case ('devoluciones') {
+        <section class="panel table-responsive">
+          <table class="table align-middle">
+            <thead><tr><th>Pedido</th><th>Cliente</th><th>Fecha</th><th>Estado</th><th>Detalle</th></tr></thead>
+            <tbody>@for (d of devoluciones(); track d.id) {
+              <tr><td class="folio">{{ d.pedido?.folio || d.pedido_id }}</td><td>{{ nombreComprador(d.pedido?.cliente ?? null, d.pedido?.destinatario) }}</td>
+                <td>{{ d.creado_en | date:'dd/MM/yyyy' }}</td><td>{{ d.estado | titlecase }}</td>
+                <td><button class="btn btn-sm btn-outline-dark" type="button" [disabled]="ocupado()" (click)="editarDevolucion(d)">Ver solicitud</button></td></tr>
+            } @empty { <tr><td colspan="5">No hay devoluciones registradas.</td></tr> }</tbody>
+          </table>
+        </section>
+        @if (devolucion; as d) {
+          <section class="panel mt-3" id="detalle-admin-devolucion" tabindex="-1">
+            <h3>Solicitud de devolución</h3>
+            <p>Pedido <strong class="folio">{{ d.pedido?.folio || d.pedido_id }}</strong>
+              <button class="btn btn-sm btn-outline-dark ms-2" type="button" [disabled]="ocupado()" (click)="verPedidoDevolucion(d.pedido_id)">Consultar pedido</button>
+            </p>
+            <p><strong>Motivo:</strong> {{ d.motivo }}</p>
+            @if (d.resolucion) { <p><strong>Resolución:</strong> {{ d.resolucion }}</p> }
+            <ul>@for (p of d.detalle_devolucion; track p.detalle_pedido_id) {
+              <li>{{ p.cantidad }} × {{ p.partida?.nombre_producto }} · {{ p.partida?.nombre_variante }}</li>
+            }</ul>
+            @if (d.estado === 'solicitada' || d.estado === 'aprobada') {
+              <form #formDevolucion="ngForm" (ngSubmit)="resolver()">
+                <fieldset class="campos" [disabled]="ocupado()">
+                  <label>Nuevo estado <select name="estado" class="form-select" [(ngModel)]="estadoDevolucion" required>
+                    <option value="">Selecciona un estado</option>
+                    @if (d.estado === 'solicitada') { <option value="aprobada">Aprobada</option><option value="rechazada">Rechazada</option> }
+                    @else { <option value="recibida">Recibida</option> }
+                  </select></label>
+                  @if (estadoDevolucion === 'recibida') {
+                    <label class="form-check align-self-center"><input class="form-check-input" type="checkbox" name="reponer" [(ngModel)]="reponer"> Reponer inventario</label>
+                  }
+                  <label class="ancho-completo">Resolución <textarea name="resolucion" maxlength="1000" class="form-control" [(ngModel)]="resolucion" required></textarea></label>
+                  <button class="btn btn-dark" type="submit" [disabled]="formDevolucion.invalid || !resolucion.trim()">Guardar resolución</button>
+                </fieldset>
+              </form>
+            }
+          </section>
+        }
+      }
+    }
+  }
+</main>

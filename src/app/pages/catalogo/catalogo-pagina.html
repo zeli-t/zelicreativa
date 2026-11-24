@@ -1,0 +1,116 @@
+﻿<div class="container pagina">
+  @if (!esRutaCategoria()) {
+    <nav aria-label="Ruta de navegación" class="ruta">
+      <a routerLink="/inicio">Inicio</a>
+      <span aria-hidden="true"> / </span>
+      @if (referencia()) {
+        <a routerLink="/catalogo">Catálogo</a><span aria-hidden="true"> / </span>
+        <span aria-current="page">{{ categoria()?.nombre ?? 'Categoría' }}</span>
+      } @else {
+        <span aria-current="page">Catálogo</span>
+      }
+    </nav>
+  }
+
+  <section class="cabecera" [class.escritura]="categoria()?.slug === 'escritura'" [class.stickers]="categoria()?.slug === 'stickers'">
+    <div>
+      <h1>{{ categoria()?.nombre ?? (referencia() ? 'Categoría' : 'Papelería creativa') }}</h1>
+      @if (categoria(); as actual) {
+        <p>{{ actual.descripcion }}</p>
+      } @else if (!referencia()) {
+        <p>Encuentra libretas, artículos de escritura y stickers para tus proyectos.</p>
+      }
+    </div>
+    @if (categoria(); as actual) {
+      <img [src]="actual.imagen" alt="">
+    }
+  </section>
+
+  @switch (catalogo.estadoCarga()) {
+    @case ('error') {
+      <div class="estado">
+        <p role="alert">{{ catalogo.error() }}</p>
+        <button type="button" class="btn btn-outline-dark" (click)="cargar()">Reintentar</button>
+      </div>
+    }
+    @case ('listo') {
+      @if (referencia() && !categoria()) {
+        <div class="estado">
+          <h2>Categoría no encontrada</h2>
+          <a routerLink="/catalogo" class="zeli-link">Ver todo el catálogo</a>
+        </div>
+      } @else {
+        <div class="filtros" aria-label="Filtros del catálogo" role="group">
+          <label>Buscar
+            <input type="search" class="form-control" placeholder="Ej. libreta"
+              [ngModel]="busqueda()" (ngModelChange)="cambiarBusqueda($event)">
+          </label>
+          <label>Categoría
+            <select class="form-select" [ngModel]="categoria()?.slug ?? ''" (ngModelChange)="cambiarCategoria($event)">
+              <option value="">Todas</option>
+              @for (opcion of catalogo.contenido().categorias; track opcion.id) {
+                <option [value]="opcion.slug">{{ opcion.nombre }}</option>
+              }
+            </select>
+          </label>
+          <label>Precio máximo
+            <input type="number" min="0" class="form-control" placeholder="Sin límite"
+              [ngModel]="precioMaximo()" (ngModelChange)="precioMaximo.set($event)">
+          </label>
+          <label>Ordenar
+            <select class="form-select" [ngModel]="orden()" (ngModelChange)="orden.set($event)">
+              <option value="normal">Por defecto</option>
+              <option value="menor">Menor precio</option>
+              <option value="mayor">Mayor precio</option>
+              <option value="nombre">Nombre</option>
+            </select>
+          </label>
+          <label>Disponibilidad
+            <select class="form-select" [ngModel]="filtroStock()" (ngModelChange)="filtroStock.set($event)">
+              <option value="todos">Todas</option>
+              <option value="disponibles">Con existencias</option>
+              <option value="agotados">Sin existencias</option>
+            </select>
+          </label>
+        </div>
+
+        @if (catalogo.estadoDisponibilidad() === 'error') {
+          <p class="conteo" role="alert">No pudimos verificar las existencias.
+            <button type="button" class="btn btn-sm btn-outline-dark ms-1" (click)="catalogo.actualizarDisponibilidad()">Reintentar</button>
+          </p>
+        }
+        @if (filtroStock() !== 'todos' && (catalogo.estadoDisponibilidad() === 'cargando' || catalogo.estadoDisponibilidad() === 'pendiente')) {
+          <p class="estado" role="status">Verificando existencias…</p>
+        } @else if (filtroStock() !== 'todos' && catalogo.estadoDisponibilidad() === 'error') {
+          <button type="button" class="btn btn-outline-dark" (click)="filtroStock.set('todos')">Ver todo sin filtrar por existencias</button>
+        } @else if (visibles().length) {
+          <p class="conteo" role="status">Mostrando {{ inicio() + 1 }} a {{ inicio() + visibles().length }} de {{ productos().length }} productos</p>
+          <div class="zeli-products">
+            @for (producto of visibles(); track producto.id) {
+              <app-card-producto [slug]="producto.slug" [nombre]="producto.nombre" [precio]="producto.precio"
+                [imagen]="producto.imagen" [oferta]="producto.oferta" [precioAnterior]="producto.precioAnterior"
+                [descripcion]="producto.descripcion" [variantes]="producto.variantes"></app-card-producto>
+            }
+          </div>
+          @if (paginas() > 1) {
+            <nav class="paginacion" aria-label="Paginación de productos">
+              <button type="button" class="btn btn-outline-dark" [disabled]="pagina() === 1" (click)="moverPagina(-1)">Anterior</button>
+              <span aria-live="polite">Página {{ pagina() }} de {{ paginas() }}</span>
+              <button type="button" class="btn btn-outline-dark" [disabled]="pagina() === paginas()" (click)="moverPagina(1)">Siguiente</button>
+            </nav>
+          }
+        } @else {
+          <div class="estado">
+            <h2>No encontramos productos</h2>
+            @if (busqueda() || precioMaximo() !== null || filtroStock() !== 'todos') {
+              <button type="button" class="btn btn-outline-dark" (click)="limpiarFiltros()">Limpiar filtros</button>
+            } @else {
+              <a routerLink="/catalogo" class="zeli-link">Ver todo el catálogo</a>
+            }
+          </div>
+        }
+      }
+    }
+    @default { <p role="status" class="estado">Cargando productos…</p> }
+  }
+</div>

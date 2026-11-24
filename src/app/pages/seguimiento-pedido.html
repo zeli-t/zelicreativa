@@ -1,0 +1,103 @@
+<div class="seguimiento mt-4 text-start">
+  @let compra = datos();
+  <section class="panel-seguimiento">
+    <div class="cabecera-seguimiento">
+      <h2>Seguimiento del pedido</h2>
+      <button type="button" class="btn btn-outline-dark btn-sm" (click)="actualizar()" [disabled]="ocupado()">Actualizar seguimiento</button>
+    </div>
+    <p>Estado actual <strong class="estado-seguimiento">{{ estado() | titlecase }}</strong></p>
+    @if (estado() === 'devuelto') {
+      <p>Se registró la recepción de todas las unidades devueltas.</p>
+    } @else if (estado() === 'cancelado') {
+      <p>El pedido se canceló.</p>
+    } @else if (indicePaso() >= 0) {
+      <ol class="pasos-entrega" aria-label="Progreso de entrega">
+        @for (paso of pasos; track paso.estado; let i = $index) {
+          <li [class.alcanzado]="i <= indicePaso()" [attr.aria-current]="i === indicePaso() ? 'step' : null">
+            <span aria-hidden="true" class="punto"></span>{{ paso.texto }}
+          </li>
+        }
+      </ol>
+    }
+    @if (estado() !== 'cancelado' && compra.envios; as envio) {
+      @if (envio.empresa?.nombre || envio.numero_guia) {
+        <p class="mb-2">
+          @if (envio.empresa?.nombre) { <span><strong>Paquetería:</strong> {{ envio.empresa?.nombre }}</span> }
+          @if (envio.numero_guia) { <span class="ms-sm-3"><strong>Guía:</strong> {{ envio.numero_guia }}</span> }
+        </p>
+      }
+    }
+    <h3>Historial de cambios</h3>
+    <ul class="list-group list-group-flush">
+      @for (evento of compra.historial_estados_pedido; track evento.id) {
+        <li class="list-group-item px-0">
+          <strong>{{ evento.estado_nuevo | titlecase }}</strong>
+          <span class="fecha ms-2">{{ evento.creado_en | date:'dd/MM/yyyy HH:mm' }}</span>
+          <div>{{ evento.motivo }}</div>
+        </li>
+      } @empty { <li class="list-group-item px-0">Aún no hay cambios registrados.</li> }
+    </ul>
+  </section>
+
+  <section class="panel-seguimiento mt-3">
+    <h2>Devoluciones</h2>
+    @if (ocupado()) { <p role="status">Procesando…</p> }
+    @if (exito()) { <p role="status" class="text-success">{{ exito() }}</p> }
+    @if (error()) { <p role="alert" class="text-danger">{{ error() }}</p> }
+    @if (requiereRevision()) {
+      <p>Actualiza el seguimiento para verificar el resultado antes de enviar otra solicitud.</p>
+    }
+    <ul class="list-group list-group-flush">
+      @for (solicitud of compra.solicitudes_devolucion; track solicitud.id) {
+        <li class="list-group-item px-0">
+          <strong>Solicitud #{{ solicitud.id }}</strong>
+          <span class="estado-seguimiento ms-2">{{ solicitud.estado | titlecase }}</span>
+          <div class="fecha">{{ solicitud.creado_en | date:'dd/MM/yyyy HH:mm' }}</div>
+          <ul class="my-2">
+            @for (partida of solicitud.detalle_devolucion; track partida.detalle_pedido_id) {
+              @let ficha = partidasPorId().get(partida.detalle_pedido_id);
+              <li>{{ partida.cantidad }} × {{ ficha?.nombre_producto || 'Partida del pedido' }}
+                @if (ficha?.nombre_variante) { · {{ ficha?.nombre_variante }} }
+              </li>
+            }
+          </ul>
+          <p class="mb-1"><strong>Motivo:</strong> {{ solicitud.motivo }}</p>
+          @if (solicitud.resolucion) {
+            <p class="mb-1"><strong>Resolución:</strong> {{ solicitud.resolucion }}
+              @if (solicitud.resuelto_en) { <span class="fecha">· {{ solicitud.resuelto_en | date:'dd/MM/yyyy HH:mm' }}</span> }
+            </p>
+          }
+        </li>
+      } @empty { <li class="list-group-item px-0">Aún no hay solicitudes para este pedido.</li> }
+    </ul>
+    @if (disponibles().length) {
+      @if (!abierto()) {
+        <button type="button" class="btn btn-dark mt-3" (click)="abierto.set(true)" [disabled]="ocupado() || requiereRevision()">Solicitar devolución</button>
+      } @else {
+        <form #form="ngForm" (ngSubmit)="enviar()" class="mt-3">
+          <fieldset [disabled]="ocupado() || requiereRevision()">
+            <legend>Selecciona las unidades que quieres devolver</legend>
+            <p class="fecha">Indica cero para las partidas que deseas conservar.</p>
+            @for (partida of disponibles(); track partida.id) {
+              <div class="fila-cantidad mb-2">
+                <label [for]="'cantidad-devolucion-' + partida.id">
+                  {{ partida.nombre_producto }} · {{ partida.nombre_variante }}
+                  <small class="d-block fecha">{{ partida.sku }} · Hasta {{ partida.maximo }} unidades</small>
+                </label>
+                <input type="number" class="form-control" [id]="'cantidad-devolucion-' + partida.id"
+                  [name]="'cantidad-' + partida.id" min="0" [max]="partida.maximo" step="1"
+                  [(ngModel)]="cantidades[partida.id]">
+              </div>
+            }
+            <label for="motivo-devolucion" class="mt-2">Motivo de la devolución</label>
+            <textarea id="motivo-devolucion" name="motivo" class="form-control" [(ngModel)]="motivo" required maxlength="1000"></textarea>
+            <button type="submit" class="btn btn-dark mt-3" [disabled]="form.invalid">Enviar solicitud</button>
+            <button type="button" class="btn btn-outline-dark ms-2 mt-3" (click)="abierto.set(false)">Cerrar</button>
+          </fieldset>
+        </form>
+      }
+    } @else if (compra.estado === 'entregado' && compra.cliente?.activo && estado() !== 'devuelto') {
+      <p class="mb-0 mt-2">Todas las unidades están incluidas en solicitudes de devolución.</p>
+    }
+  </section>
+</div>

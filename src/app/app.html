@@ -2,6 +2,25 @@
 
 <app-navbar></app-navbar>
 
-<router-outlet></router-outlet>
+<main>
+  @if (!cierreSesion.confirmado()) {
+    <router-outlet></router-outlet>
+  }
+  <div aria-live="polite" aria-atomic="true">
+    @if (cierreSesion.confirmado()) {
+      <section class="cierre-confirmado container my-4 my-md-5 text-center">
+        <span class="cierre-icono" aria-hidden="true"><i class="bi bi-check2"></i></span>
+        <h1>¡Sesión cerrada correctamente!</h1>
+        <p>Gracias por visitar Zeli Creativa. 💗</p>
+      </section>
+    }
+  </div>
+  @if (cierreSesion.error()) {
+    <div class="cierre-error">
+      <p class="mb-0" role="alert">{{ cierreSesion.error() }}</p>
+      <button class="btn-close" type="button" aria-label="Cerrar aviso" (click)="cierreSesion.error.set('')"></button>
+    </div>
+  }
+</main>
 
 <app-footer></app-footer>

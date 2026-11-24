@@ -1,0 +1,14 @@
+.panel-seguimiento { background: white; border: 1px solid var(--zeli-line); border-radius: .9rem; padding: clamp(1rem, 3vw, 1.5rem); }
+.panel-seguimiento h2 { font-size: 1.35rem; margin-bottom: .6rem; }
+.panel-seguimiento h3, legend { font-size: 1.1rem; }
+.cabecera-seguimiento { display: flex; justify-content: space-between; flex-wrap: wrap; gap: .65rem; margin-bottom: .65rem; }
+.estado-seguimiento { display: inline-block; border-radius: 1rem; padding: .15rem .6rem; background: var(--zeli-pink); color: var(--zeli-berry); }
+.pasos-entrega { display: grid; grid-template-columns: repeat(4, 1fr); list-style: none; padding: 0; text-align: center; margin: 1.15rem 0 1.5rem; }
+.pasos-entrega li { position: relative; font-size: .85rem; color: var(--zeli-muted); }
+.pasos-entrega li:not(:last-child)::after { content: ''; height: 2px; background: var(--zeli-line); position: absolute; left: 50%; right: -50%; top: .42rem; }
+.pasos-entrega li.alcanzado:has(+ .alcanzado)::after { background: var(--zeli-berry); }
+.punto { position: relative; z-index: 1; display: block; width: .9rem; height: .9rem; margin: 0 auto .35rem; border: 2px solid var(--zeli-line); border-radius: 50%; background: white; }
+.alcanzado .punto { border-color: var(--zeli-berry); background: var(--zeli-berry); }
+[aria-current="step"] { font-weight: 700; }
+.fecha { color: var(--zeli-muted); font-size: .9rem; }
+.fila-cantidad { display: grid; grid-template-columns: minmax(0, 1fr) 5.5rem; align-items: center; gap: .6rem; }

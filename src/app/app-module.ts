@@ -12,12 +12,14 @@ import { CardCategoria } from './components/card-categoria/card-categoria';
 import { QuickView } from './components/quick-view/quick-view';
 import { CarritoLateral } from './components/carrito-lateral/carrito-lateral';
 import { Inicio } from './pages/inicio/inicio';
+import { CatalogoPagina } from './pages/catalogo/catalogo-pagina';
 import { DetalleProducto } from './pages/detalle-producto/detalle-producto';
 import { IniciarSesion } from './pages/iniciar-sesion/iniciar-sesion';
 import { Registro } from './pages/registro/registro';
 import { Carrito } from './pages/carrito/carrito';
 import { Checkout } from './pages/checkout/checkout';
 import { ConfirmacionPedido } from './pages/confirmacion-pedido/confirmacion-pedido';
+import { SeguimientoPedido } from './pages/seguimiento-pedido';
 import { FormsModule } from '@angular/forms';
 import { ListaDeseos } from './pages/lista-deseos/lista-deseos';
 
@@ -35,6 +37,7 @@ import { ListaDeseos } from './pages/lista-deseos/lista-deseos';
     QuickView,
     CarritoLateral,
     Inicio,
+    CatalogoPagina,
     DetalleProducto,
     IniciarSesion,
     Registro,
@@ -44,7 +47,7 @@ import { ListaDeseos } from './pages/lista-deseos/lista-deseos';
     ListaDeseos,
     
   ],
-  imports: [BrowserModule, FormsModule, AppRoutingModule],
+  imports: [BrowserModule, FormsModule, AppRoutingModule, SeguimientoPedido],
   providers: [provideBrowserGlobalErrorListeners()],
   bootstrap: [App],
 })

@@ -1,0 +1,19 @@
+﻿.pagina { padding-block: 1.25rem clamp(2.5rem, 6vw, 5rem); }
+.ruta { margin-bottom: .9rem; font-size: .9rem; color: var(--zeli-muted); }
+.ruta a { color: var(--zeli-berry); }
+.ruta span { margin-inline: .18rem; }
+.cabecera { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 1rem; padding: clamp(1rem, 3vw, 2.5rem); background: var(--zeli-pink); border-radius: 1.3rem; }
+.cabecera.escritura { background: #f3e9fb; }
+.cabecera.stickers { background: #fceee7; }
+.cabecera h1 { font-size: clamp(1.85rem, 6vw, 3.85rem); margin: 0; letter-spacing: -.06em; font-weight: 750; }
+.cabecera p { margin: .4rem 0 0; color: var(--zeli-muted); }
+.cabecera img { width: clamp(4.4rem, 20vw, 14rem); aspect-ratio: 1.55; object-fit: cover; border-radius: .85rem; border: 3px solid #ffffffb8; }
+.filtros { display: grid; grid-template-columns: minmax(0, 1.35fr) repeat(4, minmax(0, 1fr)); gap: .8rem; border: 1px solid var(--zeli-line); border-radius: .9rem; padding: 1rem; margin-top: 1.3rem; background: var(--zeli-blush); }
+.filtros label { display: block; font-size: .9rem; font-weight: 600; }
+.filtros input, .filtros select { margin-top: .25rem; min-height: 44px; }
+.conteo { color: var(--zeli-muted); margin: 1.15rem 0 .75rem; }
+.estado { padding: 2.5rem 1rem; text-align: center; }
+.estado h2 { font-size: 1.3rem; margin-bottom: .8rem; }
+@media (max-width: 767px) { .filtros { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 360px) { .filtros { padding: .65rem; gap: .55rem; } }
+.paginacion { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: .6rem; margin-top: 1.35rem; }

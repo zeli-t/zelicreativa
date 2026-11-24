@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, computed, effect, inject, linkedSignal, OnInit, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
-import { Carrito } from '../../services/carrito';
+import { Carrito, LIMITE_POR_VARIANTE } from '../../services/carrito';
+import { Catalogo } from '../../services/catalogo';
 
 @Component({
   selector: 'app-detalle-producto',
@@ -10,105 +12,68 @@ import { Carrito } from '../../services/carrito';
 })
 export class DetalleProducto implements OnInit {
 
-  producto: any = null;
+  readonly catalogo = inject(Catalogo);
+  private readonly route = inject(ActivatedRoute);
+  private readonly carrito = inject(Carrito);
+  private readonly parametros = toSignal(this.route.queryParamMap, {
+    initialValue: this.route.snapshot.queryParamMap,
+  });
 
+  readonly productoSeleccionado = computed(() => {
+    const referencia = this.parametros().get('producto');
+    return this.catalogo.contenido().productos.find(p => p.slug === referencia || p.nombre === referencia);
+  });
+
+  get producto() {
+    return this.productoSeleccionado();
+  }
+
+  readonly imagenId = linkedSignal(() => this.productoSeleccionado()?.imagenes?.[0]?.id ?? null);
+  readonly imagen = computed(() => this.productoSeleccionado()?.imagenes?.find(i => i.id === this.imagenId()));
+  readonly aviso = signal('');
+  readonly limite = LIMITE_POR_VARIANTE;
   cantidad = 1;
+  variante: number | null = null;
 
-  variante = 'Rosa';
+  get varianteElegida() { return this.producto?.variantes.find(v => v.id === this.variante); }
+  get disponibilidad(): boolean | undefined {
+    return this.variante === null ? undefined : this.catalogo.disponibilidad().get(this.variante);
+  }
 
-  productos = [
-
-    {
-      nombre: 'Libreta personalizada',
-      precio: 180,
-      imagen: '2.jpg',
-      categoria: 'Libretas',
-      oferta: false,
-      precioAnterior: 0
-    },
-
-    {
-      nombre: 'Set de plumas',
-      precio: 95,
-      imagen: 'plumas.jpg',
-      categoria: 'Escritura',
-      oferta: false,
-      precioAnterior: 0
-    },
-
-    {
-      nombre: 'Marcadores permanentes',
-      precio: 120,
-      imagen: 'marcadores2.jpg',
-      categoria: 'Marcadores',
-      oferta: true,
-      precioAnterior: 150
-    },
-
-    {
-      nombre: 'Pack de stickers',
-      precio: 65,
-      imagen: 'stickers.jpg',
-      categoria: 'Stickers',
-      oferta: false,
-      precioAnterior: 0
-    }
-
-  ];
-
-  constructor(
-    private route: ActivatedRoute,
-    private carrito: Carrito
-  ) {}
-
-  ngOnInit() {
-
-    this.route.queryParams.subscribe(params => {
-
-      const nombre = params['producto'];
-
-      this.producto = this.productos.find(
-        producto => producto.nombre === nombre
-      );
-
+  constructor() {
+    effect(() => {
+      const variantes = this.productoSeleccionado()?.variantes ?? [];
+      this.variante = variantes.find(v => v.predeterminada)?.id ??
+        (variantes.length === 1 ? variantes[0].id : null);
+      this.cantidad = 1;
+      this.aviso.set('');
     });
-
   }
 
-  aumentarCantidad() {
-
-    if (this.cantidad < 10) {
-
-      this.cantidad++;
-
-    } else {
-
-      alert('Has alcanzado el límite de inventario.');
-
-    }
-
+  ngOnInit(): void {
+    void this.cargar();
   }
 
-  disminuirCantidad() {
-
-    if (this.cantidad > 1) {
-
-      this.cantidad--;
-
-    }
-
+  async cargar(): Promise<void> {
+    await this.catalogo.cargar();
+    await this.catalogo.actualizarDisponibilidad();
   }
 
-  agregarAlCarrito() {
+  elegirVariante(id: number | null): void {
+    this.variante = id;
+    this.cantidad = 1;
+    this.aviso.set('');
+  }
 
-    for (let i = 0; i < this.cantidad; i++) {
+  aumentarCantidad(): void { if (this.cantidad < this.limite) this.cantidad++; }
+  disminuirCantidad(): void { if (this.cantidad > 1) this.cantidad--; }
 
-      this.carrito.agregarProducto(this.producto);
-
-    }
-
-    alert('Producto agregado al carrito 🛒');
-
+  agregarAlCarrito(): void {
+    const producto = this.producto;
+    if (!producto || this.variante === null || this.disponibilidad === false) return;
+    this.aviso.set(this.carrito.agregarProducto(producto.slug, this.variante, this.cantidad)
+      ? 'Producto agregado al carrito.'
+      : 'Esta variante no está disponible o la cantidad supera el límite de 10 unidades.');
   }
 
 }

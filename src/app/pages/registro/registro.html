@@ -10,48 +10,59 @@
           Crear cuenta 💕
         </h2>
 
-        <label>Nombre</label>
+        <form (ngSubmit)="registrar()" novalidate>
+        <label for="registro-nombre">Nombre</label>
 
         <input
           type="text"
+          id="registro-nombre"
+          name="nombre"
+          autocomplete="name"
+          maxlength="100"
           class="form-control mb-3"
-          [class.is-invalid]="enviado && !nombre"
-          [class.is-valid]="nombre"
+          [class.is-invalid]="enviado && !nombre.trim()"
+          [class.is-valid]="nombre.trim()"
           placeholder="Nombre"
           [(ngModel)]="nombre">
 
         <div
           class="invalid-feedback"
-          *ngIf="enviado && !nombre">
+          *ngIf="enviado && !nombre.trim()">
 
           El nombre es obligatorio.
 
         </div>
 
 
-        <label>Correo electrónico</label>
+        <label for="registro-correo">Correo electrónico</label>
 
         <input
           type="email"
+          id="registro-correo"
+          name="correo"
+          autocomplete="email"
           class="form-control mb-3"
-          [class.is-invalid]="enviado && !correo"
-          [class.is-valid]="correo"
+          [class.is-invalid]="enviado && !emailValido"
+          [class.is-valid]="emailValido"
           placeholder="Correo electrónico"
           [(ngModel)]="correo">
 
         <div
           class="invalid-feedback"
-          *ngIf="enviado && !correo">
+          *ngIf="enviado && !emailValido">
 
-          El correo es obligatorio.
+          Escribe un correo electrónico válido.
 
         </div>
 
 
-        <label>Contraseña</label>
+        <label for="registro-password">Contraseña</label>
 
         <input
           type="password"
+          id="registro-password"
+          name="password"
+          autocomplete="new-password"
           class="form-control mb-3"
           [class.is-invalid]="enviado && password.length < 6"
           [class.is-valid]="password.length >= 6"
@@ -67,10 +78,13 @@
         </div>
 
 
-        <label>Confirmar contraseña</label>
+        <label for="registro-confirmacion">Confirmar contraseña</label>
 
         <input
           type="password"
+          id="registro-confirmacion"
+          name="confirmacion"
+          autocomplete="new-password"
           class="form-control mb-3"
           [class.is-invalid]="enviado && confirmarPassword !== password"
           [class.is-valid]="confirmarPassword && confirmarPassword === password"
@@ -88,11 +102,16 @@
 
         <button
           class="btn btn-dark w-100"
-          (click)="registrar()">
+          type="submit"
+          [disabled]="pendiente()">
 
-          Crear cuenta
+          {{ pendiente() ? 'Creando cuenta…' : 'Crear cuenta' }}
 
         </button>
+        </form>
+
+        @if (error()) { <p class="text-danger mt-3 mb-0" role="alert">{{ error() }}</p> }
+        @if (aviso()) { <p class="mt-3 mb-0" role="status">{{ aviso() }}</p> }
 
         <p class="text-center mt-3">
 

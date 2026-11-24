@@ -1,1 +1,42 @@
-/* You can add global styles to this file, and also import other style files */
+﻿:root {
+  --zeli-ink: #30212b;
+  --zeli-muted: #695761;
+  --zeli-berry: #813852;
+  --zeli-pink: #ffe4ee;
+  --zeli-blush: #fff5f8;
+  --zeli-line: #efdde4;
+}
+
+body { color: var(--zeli-ink); }
+@media (prefers-reduced-motion: reduce) {
+  .cargando-cierre { animation: none; }
+}
+a:focus-visible, button:focus-visible {
+  outline: 2px solid var(--zeli-berry);
+  outline-offset: 3px;
+}
+.zeli-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: .55rem 1.15rem;
+  border-radius: .65rem;
+  background: var(--zeli-ink);
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+}
+.zeli-btn:hover { background: var(--zeli-berry); color: white; }
+.zeli-link { color: var(--zeli-berry); font-weight: 600; text-underline-offset: .2em; }
+.zeli-products {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .75rem;
+}
+@media (min-width: 576px) {
+  .zeli-products { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+}
+@media (min-width: 992px) {
+  .zeli-products { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.25rem; }
+}

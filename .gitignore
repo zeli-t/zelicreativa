@@ -10,6 +10,7 @@
 /node_modules
 npm-debug.log
 yarn-error.log
+*.log
 
 # IDEs and editors
 .idea/
@@ -22,11 +23,7 @@ yarn-error.log
 
 # Visual Studio Code
 .vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
 !.vscode/extensions.json
-!.vscode/mcp.json
 .history/*
 
 # Miscellaneous
@@ -42,3 +39,34 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Configuración local, credenciales y claves
+.env
+.env.*
+!.env.example
+/src/environments/environment.ts
+/src/environments/environment.checkout-test.ts
+.npmrc
+.pgpass
+pgpass.conf
+pg_service.conf
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Supabase CLI, respaldos y evidencias locales
+/supabase/.branches/
+/supabase/.temp/
+/supabase/pruebas_checkout/preparar_zeli_test_listo.sql
+/supabase/verificar_integridad_zeli_test_listo.sql
+*.dump
+*.bak
+*.backup
+*.sql.gz
+*.tmp
+/respaldos/
+/backups/
+/ZeliRecuperacion/
+/entrega-final/evidencia/privada/

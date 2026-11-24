@@ -57,6 +57,15 @@
               ],
               "outputHashing": "all"
             },
+            "checkout-test": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "fileReplacements": [{
+                "replace": "src/environments/environment.ts",
+                "with": "src/environments/environment.checkout-test.ts"
+              }]
+            },
             "development": {
               "optimization": false,
               "extractLicenses": false,
@@ -70,6 +79,9 @@
           "configurations": {
             "production": {
               "buildTarget": "papevirtual:build:production"
+            },
+            "checkout-test": {
+              "buildTarget": "papevirtual:build:checkout-test"
             },
             "development": {
               "buildTarget": "papevirtual:build:development"

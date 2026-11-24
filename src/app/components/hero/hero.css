@@ -1,51 +1,32 @@
-.hero {
-  background-color: rgb(255, 239, 190);
-  padding: 60px 20px;
+﻿.hero { margin-block: 1rem 0; }
+.hero-layout {
+  display: grid;
+  grid-template-columns: .9fr 1.1fr;
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 4rem);
+  padding: clamp(1.4rem, 4.5vw, 4.5rem);
+  background: linear-gradient(130deg, #fff1f6, #ffe4ee);
+  border: 1px solid #f7dce7;
+  border-radius: 1.45rem;
 }
-
-.hero h1 {
-  font-size: 42px;
-  font-weight: bold;
+.intro { color: var(--zeli-berry); font-weight: 700; margin-bottom: .8rem; }
+.intro i { margin-right: .35rem; }
+h1 { margin: 0; font-size: clamp(2.65rem, 6vw, 5.4rem); line-height: .99; letter-spacing: -.06em; font-weight: 750; }
+h1 span { color: var(--zeli-berry); }
+.descripcion { margin: 1.1rem 0 1.35rem; max-width: 27ch; color: var(--zeli-muted); font-size: clamp(1rem, 1.9vw, 1.2rem); }
+.hero-fotos {
+  display: grid;
+  grid-template-columns: 1.42fr 1fr;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: .6rem;
+  height: clamp(13rem, 32vw, 27rem);
 }
-
-.hero p {
-  font-size: 18px;
-  margin: 20px 0;
+.hero-fotos img {
+  width: 100%; height: 100%; min-height: 0; object-fit: cover;
+  border-radius: .85rem; border: .25rem solid #ffffffbf; background: #f8e8ef;
 }
-
-.hero-icon {
-  font-size: 150px;
-  color: #d94f7d;
-}
-
-
-/* =========================
-   DISEÑO PARA CELULAR
-   ========================= */
-
-@media (max-width: 576px) {
-
-  .hero {
-    padding: 40px 20px;
-    text-align: center;
-  }
-
-  .hero h1 {
-    font-size: 30px;
-  }
-
-  .hero p {
-    font-size: 16px;
-    margin: 15px 0;
-  }
-
-  .hero-icon {
-    font-size: 90px;
-    margin-top: 20px;
-  }
-
-  .hero .btn {
-    width: 100%;
-  }
-
+.foto-principal { grid-row: span 2; }
+@media (max-width: 767px) {
+  .hero-layout { grid-template-columns: 1fr; }
+  .hero-fotos { height: clamp(12rem, 55vw, 20rem); }
 }

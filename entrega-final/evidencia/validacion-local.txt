@@ -1,0 +1,20 @@
+Zeli Creativa | 23 de noviembre de 2026 | Validación local
+
+PostgreSQL
+  psql (PostgreSQL) 17.12
+  pg_dump (PostgreSQL) 17.12
+  pg_restore (PostgreSQL) 17.12
+  El clúster dedicado estaba en ejecución.
+
+Angular y TypeScript
+  Node.js v26.13.1, npm 11.20.0
+  tsc -p tsconfig.app.json --noEmit: sin diagnósticos
+  npm.cmd test -- --watch=false: 26 archivos y 62 pruebas aprobadas
+  npm.cmd run build -- --configuration checkout-test: completada
+  Tamaño inicial del perfil de pruebas: 2.28 MB
+  Artefacto: dist/papevirtual
+
+Estado de recuperación
+  Esta sesión registró la preparación local. El ensayo posterior se completó.
+  El resultado final está documentado en ../11-reporte-recuperacion.md.
+  Este registro resume las salidas observadas.

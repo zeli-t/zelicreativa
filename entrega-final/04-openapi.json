@@ -1,0 +1,2297 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Zeli Creativa | API de demostración",
+    "version": "0.0.0",
+    "description": "Contrato de aplicación derivado del código y las migraciones. Configura el host autorizado antes de cualquier prueba."
+  },
+  "servers": [
+    {
+      "url": "https://{project}.supabase.co",
+      "variables": {
+        "project": {
+          "default": "proyecto-de-pruebas"
+        }
+      }
+    }
+  ],
+  "security": [
+    {
+      "apiKey": [],
+      "jwt": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "apiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "apikey"
+      },
+      "jwt": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "paths": {
+    "/rest/v1/rpc/disponibilidad_catalogo": {
+      "post": {
+        "operationId": "disponibilidad_catalogo",
+        "description": "Lectura pública de disponibilidad por variante.",
+        "security": [
+          {
+            "apiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "p_variantes": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "format": "int64"
+                    }
+                  }
+                },
+                "required": [
+                  "p_variantes"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      }
+    },
+    "/rest/v1/rpc/registrar_pedido": {
+      "post": {
+        "operationId": "registrar_pedido",
+        "description": "Cliente activo. Cotiza o confirma. El teléfono válido es obligatorio para un pedido nuevo. La misma solicitud debe reutilizar el UUID.",
+        "security": [
+          {
+            "apiKey": [],
+            "jwt": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "p_items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "format": "int64"
+                        },
+                        "cantidad": {
+                          "type": "integer",
+                          "minimum": 1
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "cantidad"
+                      ]
+                    }
+                  },
+                  "p_direccion": {
+                    "type": "integer",
+                    "format": "int64"
+                  },
+                  "p_idempotencia": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "p_terminos_version": {
+                    "type": "string"
+                  },
+                  "p_total_confirmado": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "p_cupon": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "p_telefono_entrega": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "p_items",
+                  "p_direccion",
+                  "p_idempotencia",
+                  "p_terminos_version"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      }
+    },
+    "/rest/v1/rpc/solicitar_devolucion": {
+      "post": {
+        "operationId": "solicitar_devolucion",
+        "description": "Cliente activo y pedido propio elegible. Devuelve ID de solicitud.",
+        "security": [
+          {
+            "apiKey": [],
+            "jwt": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "p_pedido": {
+                    "type": "integer",
+                    "format": "int64"
+                  },
+                  "p_items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "format": "int64"
+                        },
+                        "cantidad": {
+                          "type": "integer",
+                          "minimum": 1
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "cantidad"
+                      ]
+                    }
+                  },
+                  "p_motivo": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "p_pedido",
+                  "p_items",
+                  "p_motivo"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      }
+    },
+    "/rest/v1/rpc/cambiar_estado_pedido": {
+      "post": {
+        "operationId": "cambiar_estado_pedido",
+        "description": "Administrador. Valida transición y, al enviar, paquetería y guía.",
+        "security": [
+          {
+            "apiKey": [],
+            "jwt": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "p_pedido": {
+                    "type": "integer",
+                    "format": "int64"
+                  },
+                  "p_estado": {
+                    "type": "string"
+                  },
+                  "p_motivo": {
+                    "type": "string"
+                  },
+                  "p_empresa": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "format": "int64"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "p_guia": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "p_pedido",
+                  "p_estado",
+                  "p_motivo"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      }
+    },
+    "/rest/v1/rpc/ajustar_inventario": {
+      "post": {
+        "operationId": "ajustar_inventario",
+        "description": "Administrador. Devuelve el saldo nuevo.",
+        "security": [
+          {
+            "apiKey": [],
+            "jwt": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "p_variante": {
+                    "type": "integer",
+                    "format": "int64"
+                  },
+                  "p_delta": {
+                    "type": "integer"
+                  },
+                  "p_motivo": {
+                    "type": "string"
+                  },
+                  "p_stock_minimo": {
+                    "anyOf": [
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "p_variante",
+                  "p_delta",
+                  "p_motivo"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      }
+    },
+    "/rest/v1/rpc/resolver_devolucion": {
+      "post": {
+        "operationId": "resolver_devolucion",
+        "description": "Administrador. Valida la resolución y la reposición si procede.",
+        "security": [
+          {
+            "apiKey": [],
+            "jwt": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "p_solicitud": {
+                    "type": "integer",
+                    "format": "int64"
+                  },
+                  "p_estado": {
+                    "type": "string"
+                  },
+                  "p_resolucion": {
+                    "type": "string"
+                  },
+                  "p_reponer": {
+                    "anyOf": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "p_solicitud",
+                  "p_estado",
+                  "p_resolucion"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      }
+    },
+    "/rest/v1/rpc/asignar_rol": {
+      "post": {
+        "operationId": "asignar_rol",
+        "description": "Administrador. Modifica un rol de aplicación y registra auditoría.",
+        "security": [
+          {
+            "apiKey": [],
+            "jwt": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "p_usuario": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "p_rol": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "p_usuario",
+                  "p_rol"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      }
+    },
+    "/rest/v1/productos": {
+      "get": {
+        "operationId": "leer_productos",
+        "description": "Lectura pública filtrada por políticas.",
+        "security": [
+          {
+            "apiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "select",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      },
+      "post": {
+        "operationId": "crear_productos",
+        "description": "Administrador.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "editar_productos",
+        "description": "Edición autorizada por políticas y rol.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      }
+    },
+    "/rest/v1/categorias": {
+      "get": {
+        "operationId": "leer_categorias",
+        "description": "Lectura pública filtrada por políticas.",
+        "security": [
+          {
+            "apiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "select",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      },
+      "post": {
+        "operationId": "crear_categorias",
+        "description": "Administrador.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "editar_categorias",
+        "description": "Edición autorizada por políticas y rol.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      }
+    },
+    "/rest/v1/variantes_producto": {
+      "get": {
+        "operationId": "leer_variantes_producto",
+        "description": "Lectura pública filtrada por políticas.",
+        "security": [
+          {
+            "apiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "select",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      },
+      "post": {
+        "operationId": "crear_variantes_producto",
+        "description": "Administrador.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "editar_variantes_producto",
+        "description": "Edición autorizada por políticas y rol.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      }
+    },
+    "/rest/v1/imagenes_producto": {
+      "get": {
+        "operationId": "leer_imagenes_producto",
+        "description": "Lectura pública filtrada por políticas.",
+        "security": [
+          {
+            "apiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "select",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      },
+      "post": {
+        "operationId": "crear_imagenes_producto",
+        "description": "Administrador.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "editar_imagenes_producto",
+        "description": "Edición autorizada por políticas y rol.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "eliminar_imagen",
+        "description": "Administrador.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      }
+    },
+    "/rest/v1/inventario": {
+      "get": {
+        "operationId": "leer_inventario",
+        "description": "Lectura protegida por privilegios y RLS.",
+        "security": [
+          {
+            "apiKey": [],
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "select",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      }
+    },
+    "/rest/v1/movimientos_inventario": {
+      "get": {
+        "operationId": "leer_movimientos_inventario",
+        "description": "Lectura protegida por privilegios y RLS.",
+        "security": [
+          {
+            "apiKey": [],
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "select",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      }
+    },
+    "/rest/v1/pedidos": {
+      "get": {
+        "operationId": "leer_pedidos",
+        "description": "Lectura protegida por privilegios y RLS.",
+        "security": [
+          {
+            "apiKey": [],
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "select",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "folio",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      }
+    },
+    "/rest/v1/usuarios": {
+      "get": {
+        "operationId": "leer_usuarios",
+        "description": "Lectura protegida por privilegios y RLS.",
+        "security": [
+          {
+            "apiKey": [],
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "select",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "editar_usuarios",
+        "description": "Nombre y teléfono propios.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      }
+    },
+    "/rest/v1/direcciones": {
+      "get": {
+        "operationId": "leer_direcciones",
+        "description": "Lectura protegida por privilegios y RLS.",
+        "security": [
+          {
+            "apiKey": [],
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "select",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      },
+      "post": {
+        "operationId": "crear_direcciones",
+        "description": "Dirección propia.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "editar_direcciones",
+        "description": "Edición autorizada por políticas y rol.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      }
+    },
+    "/rest/v1/cupones": {
+      "get": {
+        "operationId": "leer_cupones",
+        "description": "Lectura protegida por privilegios y RLS.",
+        "security": [
+          {
+            "apiKey": [],
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "select",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      },
+      "post": {
+        "operationId": "crear_cupones",
+        "description": "Administrador.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "editar_cupones",
+        "description": "Edición autorizada por políticas y rol.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      }
+    },
+    "/rest/v1/solicitudes_devolucion": {
+      "get": {
+        "operationId": "leer_solicitudes_devolucion",
+        "description": "Lectura protegida por privilegios y RLS.",
+        "security": [
+          {
+            "apiKey": [],
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "select",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      }
+    },
+    "/rest/v1/auditoria": {
+      "get": {
+        "operationId": "leer_auditoria",
+        "description": "Lectura protegida por privilegios y RLS.",
+        "security": [
+          {
+            "apiKey": [],
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "select",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      }
+    },
+    "/rest/v1/empresas_paqueteria": {
+      "get": {
+        "operationId": "leer_empresas_paqueteria",
+        "description": "Lectura protegida por privilegios y RLS.",
+        "security": [
+          {
+            "apiKey": [],
+            "jwt": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "select",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      }
+    },
+    "/auth/v1/signup": {
+      "post": {
+        "operationId": "auth_signup",
+        "description": "Crear cuenta",
+        "security": [
+          {
+            "apiKey": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/v1/token": {
+      "post": {
+        "operationId": "auth_token",
+        "description": "Inicio de sesión o renovación de sesión",
+        "security": [
+          {
+            "apiKey": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  },
+                  "refresh_token": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "grant_type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "password",
+                "refresh_token"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "/auth/v1/recover": {
+      "post": {
+        "operationId": "auth_recover",
+        "description": "Solicitar recuperación",
+        "security": [
+          {
+            "apiKey": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/v1/logout": {
+      "post": {
+        "operationId": "auth_logout",
+        "description": "Cerrar sesión",
+        "security": [
+          {
+            "apiKey": [],
+            "jwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        }
+      }
+    },
+    "/auth/v1/user": {
+      "put": {
+        "operationId": "auth_user",
+        "description": "Actualizar contraseña con sesión",
+        "security": [
+          {
+            "apiKey": [],
+            "jwt": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultado disponible"
+          },
+          "204": {
+            "description": "Operación completada sin representación"
+          },
+          "400": {
+            "description": "Validación, parámetros o JSON inválidos"
+          },
+          "401": {
+            "description": "Autenticación ausente o inválida"
+          },
+          "403": {
+            "description": "Acceso denegado"
+          },
+          "409": {
+            "description": "Conflicto de restricciones"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import { Carrito } from '../../services/carrito';
+import type { VarianteCatalogo } from '../../services/catalogo';
 
 @Component({
   selector: 'app-card-producto',
@@ -10,18 +10,20 @@ import { Carrito } from '../../services/carrito';
 })
 export class CardProducto implements OnInit {
 
+  @Input() slug = '';
   @Input() nombre = '';
   @Input() precio = 0;
   @Input() imagen = '';
+  @Input() descripcion = '';
   @Input() oferta = false;
   @Input() precioAnterior = 0;
+  @Input() variantes: VarianteCatalogo[] = [];
 
   mostrarQuickView = false;
   favorito = false;
 
   constructor(
-    private carrito: Carrito,
-    private router: Router
+    private carrito: Carrito
   ) {}
 
   ngOnInit() {
@@ -38,15 +40,15 @@ export class CardProducto implements OnInit {
 
   agregarAlCarrito() {
 
-    const producto = {
-      nombre: this.nombre,
-      precio: this.precio,
-      imagen: this.imagen
-    };
-
-    this.carrito.agregarProducto(producto);
-
-    alert('Producto agregado al carrito 🛒');
+    const variante = this.variantes.find(v => v.predeterminada) ??
+      (this.variantes.length === 1 ? this.variantes[0] : undefined);
+    if (!variante) {
+      this.abrirQuickView();
+      return;
+    }
+    alert(this.carrito.agregarProducto(this.slug, variante.id)
+      ? 'Producto agregado al carrito 🛒'
+      : 'Esta variante no está disponible o alcanzó el límite de 10 unidades.');
 
   }
 
@@ -89,19 +91,6 @@ export class CardProducto implements OnInit {
 
   cerrarQuickView() {
     this.mostrarQuickView = false;
-  }
-
-  verDetalle() {
-
-    this.router.navigate(
-      ['/detalle-producto'],
-      {
-        queryParams: {
-          producto: this.nombre
-        }
-      }
-    );
-
   }
 
 }

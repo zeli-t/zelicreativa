@@ -1,212 +1,101 @@
-```html
-<div class="container py-5">
+﻿<div class="container py-5">
+  @if (catalogo.estadoCarga() === 'error') {
+    <div class="text-center py-5">
+      <p role="alert">{{ catalogo.error() }}</p>
+      <button type="button" class="btn btn-outline-dark" (click)="cargar()">Reintentar</button>
+    </div>
+  } @else if (catalogo.estadoCarga() !== 'listo') {
+    <p class="text-center py-5" role="status">Cargando producto…</p>
+  } @else if (producto; as ficha) {
+    <div class="row align-items-start">
+      <div class="col-md-6 mb-4">
+        <section class="galeria" aria-label="Imágenes del producto">
+          @if (imagen(); as actual) {
+            <div class="imagen-grande">
+              <img [src]="actual.ruta" [alt]="actual.texto || ficha.nombre" class="imagen-principal">
+            </div>
+            @if ((ficha.imagenes?.length ?? 0) > 1) {
+              <div class="miniaturas mt-3 flex-wrap">
+                @for (opcion of ficha.imagenes; track opcion.id; let i = $index) {
+                  <button type="button" class="miniatura p-0" [class.activa]="opcion.id === imagenId()"
+                    [attr.aria-pressed]="opcion.id === imagenId()" [attr.aria-label]="'Ver imagen ' + (i + 1)"
+                    (click)="imagenId.set(opcion.id)">
+                    <img [src]="opcion.ruta" alt="">
+                  </button>
+                }
+              </div>
+            }
+          } @else {
+            <p class="p-4 text-center">Este producto aún no tiene imágenes registradas.</p>
+          }
+        </section>
+      </div>
 
-  <div
-    *ngIf="producto"
-    class="row align-items-center">
-
-    <!-- GALERÍA -->
-
-    <div class="col-md-6 mb-4">
-
-      <div class="galeria">
-
-        <div class="imagen-grande">
-
-          <img
-            [src]="producto.imagen"
-            [alt]="producto.nombre"
-            class="imagen-principal">
-
+      <div class="col-md-6">
+        @if (ficha.oferta) { <span class="badge bg-danger mb-2">Oferta</span> }
+        <h1>{{ ficha.nombre }}</h1>
+        <div class="precios mb-3">
+          @if (ficha.oferta) { <span class="precio-anterior">{{ ficha.precioAnterior + (varianteElegida?.precioAdicional ?? 0) | currency:'MXN':'code' }}</span> }
+          <span class="precio">{{ ficha.precio + (varianteElegida?.precioAdicional ?? 0) | currency:'MXN':'code' }}</span>
         </div>
+        <hr>
+        <h2 class="h5">Descripción</h2>
+        <p>{{ ficha.descripcion }}</p>
 
-        <div class="miniaturas mt-3">
-
-          <div class="miniatura activa">
-
-            <img
-              [src]="producto.imagen"
-              [alt]="producto.nombre">
-
+        @if (ficha.variantes.length) {
+          <div class="mb-3">
+            <label for="ficha-variante">Variante</label>
+            <select id="ficha-variante" class="form-select" [ngModel]="variante" (ngModelChange)="elegirVariante($event)">
+              <option [ngValue]="null" disabled>Selecciona una variante</option>
+              @for (opcion of ficha.variantes; track opcion.id) {
+                <option [ngValue]="opcion.id">{{ opcion.nombre }}</option>
+              }
+            </select>
           </div>
 
-        </div>
+          @if (varianteElegida; as elegida) {
+            <div class="rounded p-3 mb-3 existencias-ficha">
+              <div><strong>SKU:</strong> {{ elegida.sku }}</div>
+              <div role="status">
+                <strong>Existencias:</strong>
+                @if (catalogo.estadoDisponibilidad() === 'cargando' || catalogo.estadoDisponibilidad() === 'pendiente') {
+                  Verificando…
+                } @else if (disponibilidad === true) {
+                  Disponible
+                } @else if (disponibilidad === false) {
+                  Agotada
+                } @else {
+                  Sin confirmación de existencias.
+                }
+              </div>
+              @if (catalogo.estadoDisponibilidad() === 'error') {
+                <button type="button" class="btn btn-sm btn-outline-dark mt-2" (click)="catalogo.actualizarDisponibilidad()">Reintentar consulta</button>
+              }
+            </div>
+          }
 
-      </div>
-
-    </div>
-
-
-    <!-- INFORMACIÓN DEL PRODUCTO -->
-
-    <div class="col-md-6">
-
-      <span
-        *ngIf="producto.oferta"
-        class="badge bg-danger mb-2">
-
-        Oferta
-
-      </span>
-
-      <h1>
-        {{ producto.nombre }}
-      </h1>
-
-      <div class="precios mb-3">
-
-        <span
-          *ngIf="producto.oferta"
-          class="precio-anterior">
-
-          ${{ producto.precioAnterior }}
-
-        </span>
-
-        <span class="precio">
-
-          ${{ producto.precio }}
-
-        </span>
-
-      </div>
-
-      <p>
-        Producto ideal para darle un toque creativo
-        y bonito a tus proyectos.
-      </p>
-
-      <hr>
-
-      <h5>Descripción</h5>
-
-      <p>
-        Este producto forma parte de nuestra papelería
-        creativa y está pensado para estudiantes,
-        personas creativas y amantes de la organización.
-      </p>
-
-
-      <h5 class="mt-4">
-        Características
-      </h5>
-
-      <ul>
-
-        <li>Diseño creativo</li>
-        <li>Excelente calidad</li>
-        <li>Disponible para envío</li>
-        <li>Producto nuevo</li>
-
-      </ul>
-
-
-      <!-- VARIANTE -->
-
-      <div class="mb-3">
-
-        <label>
-          Variante
-        </label>
-
-        <select
-          class="form-select"
-          [(ngModel)]="variante">
-
-          <option value="Rosa">
-            Rosa
-          </option>
-
-          <option value="Azul">
-            Azul
-          </option>
-
-          <option value="Lila">
-            Lila
-          </option>
-
-        </select>
-
-      </div>
-
-
-      <!-- CANTIDAD -->
-
-      <div class="cantidad">
-
-        <label>
-          Cantidad
-        </label>
-
-        <div class="d-flex align-items-center gap-3 mt-2">
-
-          <button
-            class="btn btn-outline-secondary"
-            (click)="disminuirCantidad()">
-
-            −
-
+          <div class="cantidad">
+            <span>Cantidad</span>
+            <div class="d-flex align-items-center gap-3 mt-2">
+              <button type="button" class="btn btn-outline-secondary" aria-label="Disminuir cantidad" [disabled]="cantidad === 1" (click)="disminuirCantidad()">−</button>
+              <strong aria-live="polite">{{ cantidad }}</strong>
+              <button type="button" class="btn btn-outline-secondary" aria-label="Aumentar cantidad" [disabled]="cantidad >= limite" (click)="aumentarCantidad()">+</button>
+            </div>
+            <small class="text-muted">Máximo por variante: {{ limite }} unidades. El stock final se verifica al confirmar.</small>
+          </div>
+          <button type="button" class="btn btn-dark w-100 mt-4" [disabled]="variante === null || disponibilidad === false" (click)="agregarAlCarrito()">
+            <i class="bi bi-cart-plus" aria-hidden="true"></i> Agregar al carrito
           </button>
-
-          <strong>
-            {{ cantidad }}
-          </strong>
-
-          <button
-            class="btn btn-outline-secondary"
-            (click)="aumentarCantidad()">
-
-            +
-
-          </button>
-
-        </div>
-
-        <small class="text-muted">
-          Máximo disponible: 10 unidades
-        </small>
-
+          @if (aviso()) { <p class="mt-2" role="status">{{ aviso() }}</p> }
+        } @else {
+          <p role="status">No hay variantes a la venta.</p>
+        }
       </div>
-
-
-      <!-- AGREGAR -->
-
-      <button
-        class="btn btn-dark w-100 mt-4"
-        (click)="agregarAlCarrito()">
-
-        <i class="bi bi-cart-plus"></i>
-
-        Agregar al carrito
-
-      </button>
-
     </div>
-
-  </div>
-
-
-  <!-- PRODUCTO NO ENCONTRADO -->
-
-  <div
-    *ngIf="!producto"
-    class="text-center py-5">
-
-    <i class="bi bi-box-seam fs-1"></i>
-
-    <h4 class="mt-3">
-      Producto no encontrado
-    </h4>
-
-    <a
-      routerLink="/inicio"
-      class="btn btn-dark mt-3">
-
-      Volver a la tienda
-
-    </a>
-
-  </div>
-
+  } @else {
+    <div class="text-center py-5">
+      <h1 class="h4">Producto no encontrado</h1>
+      <a routerLink="/catalogo" class="btn btn-dark mt-3">Volver al catálogo</a>
+    </div>
+  }
 </div>
-```

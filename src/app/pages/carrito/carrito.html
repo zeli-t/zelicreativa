@@ -45,6 +45,30 @@
           <div class="col-md-4">
 
             <h5>{{ producto.nombre }}</h5>
+            @if (carrito.esValida(producto)) {
+              <p class="text-muted mb-1">{{ producto.variante }}</p>
+            } @else if (carrito.estadoCatalogo() === 'listo') {
+              @if (carrito.opciones(producto); as opciones) {
+                @if (opciones.length) {
+                  <label class="d-block mb-2">Elige la variante para esta partida
+                    <select #selector class="form-select form-select-sm"
+                      (change)="seleccionarVariante(producto.clave, selector)">
+                      <option value="" disabled selected>Selecciona una variante</option>
+                      @for (opcion of opciones; track opcion.id) {
+                        <option [value]="opcion.id">{{ opcion.nombre }} ({{ opcion.sku }})</option>
+                      }
+                    </select>
+                  </label>
+                } @else {
+                  <p class="text-muted mb-1">Sin variantes disponibles. Puedes quitar esta partida.</p>
+                }
+              }
+            } @else if (carrito.estadoCatalogo() === 'error') {
+              <p class="text-muted mb-1">No se pudo verificar esta variante.</p>
+              <button class="btn btn-sm btn-outline-secondary" type="button" (click)="carrito.verificarCatalogo()">Reintentar</button>
+            } @else {
+              <p class="text-muted mb-1">Verificando variante…</p>
+            }
 
             <p class="mb-0">
               ${{ producto.precio }}
@@ -58,7 +82,7 @@
 
               <button
                 class="btn btn-outline-secondary"
-                (click)="disminuirCantidad(producto.nombre)">
+                (click)="carrito.disminuirCantidad(producto.clave)">
 
                 −
 
@@ -70,7 +94,8 @@
 
               <button
                 class="btn btn-outline-secondary"
-                (click)="aumentarCantidad(producto.nombre)">
+                [disabled]="!carrito.esValida(producto) || producto.cantidad >= 10"
+                (click)="carrito.aumentarCantidad(producto.clave)">
 
                 +
 
@@ -92,7 +117,7 @@
 
             <button
               class="btn btn-outline-danger"
-              (click)="eliminarProducto(producto.nombre)">
+              (click)="carrito.eliminarProducto(producto.clave)">
 
               <i class="bi bi-trash"></i>
 
@@ -153,6 +178,7 @@
 
       <button
         class="btn btn-dark w-100 mt-3"
+        [disabled]="!carrito.puedeContinuar()"
         (click)="irAlCheckout()">
 
         Continuar con la compra

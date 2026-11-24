@@ -1,51 +1,53 @@
-.navbar {
-  background-color: rgb(255, 230, 238);
+﻿.nav-tienda {
+  background: #fff4f8;
+  border-bottom: 1px solid var(--zeli-line);
 }
 
-.nav-link {
-  color: #333;
-  font-weight: 500;
+.enlaces {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: .25rem clamp(.75rem, 2.7vw, 2.5rem);
+  padding-block: .35rem;
+  margin-bottom: 0;
+  list-style: none;
 }
 
-.nav-link:hover {
-  color: #d94f7d;
+.enlaces a {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 44px;
+  padding-inline: .9rem;
+  border-radius: .6rem;
+  color: var(--zeli-muted);
+  text-decoration: none;
+  font-size: .94rem;
+  font-weight: 650;
+  transition: background-color 150ms ease, color 150ms ease;
 }
 
-.nav-link i {
-  margin-right: 5px;
+.enlaces a:hover,
+.enlaces a.actual {
+  background: var(--zeli-pink);
+  color: var(--zeli-berry);
 }
 
-:host {
-  position: sticky;
-  top: 105px;
-  z-index: 1090;
+.enlaces a.actual::after {
+  content: '';
+  position: absolute;
+  inset: auto .85rem 3px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--zeli-berry);
 }
 
+@media (max-width: 575px) {
+  .enlaces { gap: .15rem .2rem; padding: .2rem .3rem; }
+  .enlaces a { padding-inline: .42rem; font-size: .85rem; }
+  .enlaces a.actual::after { inset-inline: .4rem; }
+}
 
-/* =========================
-   DISEÑO PARA CELULAR
-   ========================= */
-
-@media (max-width: 576px) {
-
-  :host {
-    top: 70px;
-  }
-
-  .navbar {
-    padding: 5px 10px;
-  }
-
-  .navbar-nav {
-    text-align: center;
-  }
-
-  .nav-link {
-    padding: 8px;
-  }
-
-  .dropdown-menu {
-    text-align: center;
-  }
-
+@media (prefers-reduced-motion: reduce) {
+  .enlaces a { transition: none; }
 }

@@ -1,0 +1,40 @@
+﻿<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card p-4 shadow-sm">
+        <h2 class="text-center mb-4">Restablecer contraseña</h2>
+        @if (verificando()) {
+          <p role="status">Verificando el enlace…</p>
+        } @else if (actualizada()) {
+          <p role="status">Tu contraseña se actualizó correctamente.</p>
+          @if (sesionCerrada()) {
+            <a class="btn btn-dark w-100" routerLink="/iniciar-sesion">Volver a iniciar sesión</a>
+          } @else {
+            <button class="btn btn-dark w-100" type="button" [disabled]="pendiente()" (click)="cerrarRecuperacion()">
+              Cerrar sesión de recuperación
+            </button>
+          }
+        } @else if (auth.puedeRestablecer()) {
+          <form (ngSubmit)="guardar()" novalidate>
+            <label for="nueva-contrasena">Nueva contraseña</label>
+            <input id="nueva-contrasena" name="password" type="password" autocomplete="new-password"
+              minlength="8" required class="form-control mb-3" placeholder="Mínimo 8 caracteres" [(ngModel)]="password">
+            <label for="confirmar-nueva-contrasena">Confirmar contraseña</label>
+            <input id="confirmar-nueva-contrasena" name="confirmacion" type="password" autocomplete="new-password"
+              required class="form-control mb-3" [(ngModel)]="confirmacion">
+            <button class="btn btn-dark w-100" type="submit" [disabled]="pendiente()">
+              {{ pendiente() ? 'Guardando…' : 'Guardar contraseña' }}
+            </button>
+          </form>
+          <p class="text-center mt-3 mb-0">
+            <button class="btn btn-link" type="button" [disabled]="pendiente()" (click)="cerrarRecuperacion()">Cancelar</button>
+          </p>
+        } @else {
+          <p>El enlace es inválido, venció o ya se utilizó. Solicita uno nuevo para recuperar tu cuenta.</p>
+          <a class="btn btn-dark w-100" routerLink="/recuperar-contrasena">Solicitar otro enlace</a>
+        }
+        @if (error()) { <p class="text-danger mt-3 mb-0" role="alert">{{ error() }}</p> }
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,93 @@
+<main class="container py-4 py-md-5">
+  <header class="portada p-3 p-md-4">
+    <h1>{{ esDirecciones ? 'Mis direcciones' : 'Mi cuenta' }}</h1>
+    <nav class="d-flex flex-wrap gap-3" aria-label="Opciones de mi cuenta">
+      <a routerLink="/mi-cuenta" [attr.aria-current]="esDirecciones ? null : 'page'">Mi perfil</a>
+      <a routerLink="/mis-direcciones" [attr.aria-current]="esDirecciones ? 'page' : null">Mis direcciones</a>
+      <a routerLink="/mis-pedidos">Mis pedidos</a>
+      @if (volverAlCheckout) { <a routerLink="/checkout">Volver al checkout</a> }
+    </nav>
+  </header>
+  <section class="panel mt-3 p-3 p-md-4">
+    @if (!usuario()) {
+      <p>Inicia sesión para consultar tu cuenta.</p>
+      <a routerLink="/iniciar-sesion" [queryParams]="{ volver: esDirecciones ? 'mis-direcciones' : 'mi-cuenta' }">Iniciar sesión</a>
+    } @else if (!habilitada) {
+      <p>La gestión del perfil y de direcciones está disponible desde el entorno de pruebas.</p>
+    } @else {
+      @if (ocupado()) { <p role="status">Procesando…</p> }
+      @if (aviso()) { <p class="text-success" role="status">{{ aviso() }}</p> }
+      @if (error()) {
+        <p class="text-danger" role="alert">{{ error() }}</p>
+        <button type="button" class="btn btn-sm btn-outline-dark mb-2" (click)="cargar()" [disabled]="ocupado()">Actualizar datos</button>
+      }
+
+      @if (cargado() && esDirecciones) {
+        @if (perfil()?.activo) {
+          <button type="button" class="btn btn-dark mb-3" (click)="editarDireccion()" [disabled]="ocupado()">Nueva dirección</button>
+        } @else {
+          <p role="status">Tu cuenta está inactiva y las direcciones se pueden consultar en modo lectura.</p>
+        }
+        @if (direccion; as datos) {
+          <form #formDireccion="ngForm" (ngSubmit)="guardarDireccion()" class="editor p-3 mb-3">
+            <h2 class="h5">{{ idEdicion === null ? 'Registrar dirección' : 'Editar dirección' }}</h2>
+            <fieldset class="row g-3" [disabled]="ocupado()">
+              @for (campo of campos; track campo.id) {
+                <label [class]="campo.clase">
+                  {{ campo.etiqueta }}
+                  <input type="text" class="form-control" [name]="campo.id" [attr.autocomplete]="campo.autocomplete"
+                    [attr.inputmode]="campo.id === 'codigo_postal' ? 'numeric' : null"
+                    [attr.maxlength]="campo.id === 'codigo_postal' ? 5 : null"
+                    [pattern]="campo.id === 'codigo_postal' ? '[0-9]{5}' : '.+'" [(ngModel)]="datos[campo.id]" required>
+                </label>
+              }
+              <div class="d-flex flex-wrap gap-2">
+                <button class="btn btn-dark" type="submit" [disabled]="formDireccion.invalid">Guardar dirección</button>
+                <button class="btn btn-outline-dark" type="button" (click)="cerrarDireccion()">Cerrar formulario</button>
+              </div>
+            </fieldset>
+          </form>
+        }
+        <ul class="list-group list-group-flush">
+          @for (guardada of direcciones(); track guardada.id) {
+            <li class="list-group-item px-0 py-3 d-flex flex-wrap justify-content-between gap-2">
+              <div class="text-break">
+                <strong>{{ guardada.destinatario }}</strong>
+                <div>{{ guardada.calle }} {{ guardada.numero }}, {{ guardada.colonia }}</div>
+                <div>{{ guardada.ciudad }}, {{ guardada.estado }} · {{ guardada.codigo_postal }}</div>
+              </div>
+              @if (perfil()?.activo) {
+                <div class="d-flex flex-wrap align-items-start gap-2">
+                  <button class="btn btn-outline-dark btn-sm" type="button" [disabled]="ocupado()"
+                    [attr.aria-label]="'Editar dirección de ' + guardada.destinatario" (click)="editarDireccion(guardada)">Editar</button>
+                  <button class="btn btn-outline-dark btn-sm" type="button" [disabled]="ocupado()"
+                    [attr.aria-label]="'Quitar dirección de ' + guardada.destinatario" (click)="quitarDireccion(guardada.id)">Quitar</button>
+                </div>
+              }
+            </li>
+          } @empty {
+            <li class="list-group-item px-0">Todavía no tienes direcciones activas.</li>
+          }
+        </ul>
+      } @else if (perfil(); as actual) {
+        <p>Actualiza tu nombre o el teléfono opcional de tu perfil.</p>
+        @if (!actual.activo) { <p role="status">Tu perfil está inactivo y se puede consultar en modo lectura.</p> }
+        <form #formPerfil="ngForm" (ngSubmit)="guardarPerfil()">
+          <fieldset [disabled]="ocupado() || !actual.activo">
+            <div class="row g-3">
+              <label class="col-md-6">Nombre <input name="nombre" class="form-control" autocomplete="name"
+                maxlength="100" [(ngModel)]="datosPerfil.nombre" required></label>
+              <label class="col-md-6">Teléfono de perfil <input name="telefono" type="tel" class="form-control"
+                autocomplete="tel" [(ngModel)]="datosPerfil.telefono"></label>
+            </div>
+            <small class="form-text">El teléfono de entrega se indica por separado en cada compra.</small>
+            <div class="mt-3">
+              <button type="submit" class="btn btn-dark" [disabled]="formPerfil.invalid || !datosPerfil.nombre.trim()">Guardar perfil</button>
+            </div>
+          </fieldset>
+        </form>
+        <p class="mt-3 mb-0 text-break"><strong>Correo de inicio de sesión</strong> · {{ correo() }}</p>
+      }
+    }
+  </section>
+</main>

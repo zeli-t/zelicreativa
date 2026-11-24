@@ -1,49 +1,11 @@
-.categoria-card {
-  border: none;
-  border-radius: 15px;
-  overflow: hidden;
-  height: 100%;
-}
-
-.categoria-card img {
-  height: 180px;
-  object-fit: cover;
-}
-
-.categoria-card:hover {
-  transform: translateY(-5px);
-}
-
-.card-title {
-  font-weight: bold;
-}
-
-
-/* =========================
-   DISEÑO PARA CELULAR
-   ========================= */
-
-@media (max-width: 576px) {
-
-  .categoria-card img {
-    height: 140px;
-  }
-
-  .categoria-card .card-body {
-    padding: 12px 8px;
-  }
-
-  .categoria-card .card-title {
-    font-size: 16px;
-  }
-
-  .categoria-card .card-text {
-    font-size: 13px;
-  }
-
-  .categoria-card .btn {
-    font-size: 13px;
-    padding: 6px 10px;
-  }
-
+﻿:host { display: block; }
+.categoria-card { display: grid; text-decoration: none; height: 100%; overflow: hidden; border: 1px solid var(--zeli-line); border-radius: 1.1rem; background: var(--zeli-blush); color: var(--zeli-ink); }
+.categoria-card:hover { border-color: #d993ad; color: var(--zeli-berry); }
+.categoria-card img { width: 100%; aspect-ratio: 2.15; object-fit: cover; }
+.categoria-copy { padding: .9rem 1rem; }
+h3 { font-size: clamp(1.2rem, 2.5vw, 1.6rem); font-weight: 700; margin: 0 0 .3rem; }
+p { font-size: .9rem; color: var(--zeli-muted); margin: 0; }
+@media (max-width: 575px) {
+  .categoria-card { grid-template-columns: 33% minmax(0, 1fr); }
+  .categoria-card img { aspect-ratio: auto; height: 100%; min-height: 5.5rem; }
 }

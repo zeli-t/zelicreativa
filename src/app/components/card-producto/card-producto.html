@@ -1,95 +1,31 @@
-<div class="card producto-card h-100">
-
-  <div class="imagen-producto">
-
-    <img
-      [src]="imagen"
-      class="card-img-top"
-      [alt]="nombre">
-
-    <span
-      *ngIf="oferta"
-      class="badge bg-danger oferta">
-
-      Oferta
-
-    </span>
-
-    <button
-      class="btn-favorito"
-      type="button"
-      (click)="cambiarFavorito()">
-
-      <i
-        class="bi"
-        [class.bi-heart]="!favorito"
-        [class.bi-heart-fill]="favorito">
-      </i>
-
+﻿<article class="producto-card">
+  <div class="producto-media">
+    <a [routerLink]="['/detalle-producto']" [queryParams]="{ producto: slug || nombre }" [attr.aria-label]="nombre" tabindex="-1">
+      <img [src]="imagen" alt="" loading="lazy">
+    </a>
+    @if (oferta) { <span class="oferta">Oferta</span> }
+    <button class="btn-favorito" type="button" [attr.aria-label]="'Favorito: ' + nombre"
+      [attr.aria-pressed]="favorito" (click)="cambiarFavorito()">
+      <i class="bi" [class.bi-heart]="!favorito" [class.bi-heart-fill]="favorito" aria-hidden="true"></i>
     </button>
-
   </div>
-
-  <div class="card-body">
-
-    <h5
-      class="card-title nombre-producto"
-      (click)="verDetalle()">
-
-      {{ nombre }}
-
-    </h5>
-
+  <div class="producto-info">
+    <h3><a [routerLink]="['/detalle-producto']" [queryParams]="{ producto: slug || nombre }">{{ nombre }}</a></h3>
     <div class="precios">
-
-      <span
-        *ngIf="oferta"
-        class="precio-anterior">
-
-        ${{ precioAnterior }}
-
-      </span>
-
-      <span class="precio">
-
-        ${{ precio }}
-
-      </span>
-
+      <strong>${{ precio }}</strong>
+      @if (oferta) { <del>${{ precioAnterior }}</del> }
     </div>
-
-    <div class="botones mt-3">
-
-      <button
-        class="btn btn-dark"
-        (click)="agregarAlCarrito()">
-
-        <i class="bi bi-cart-plus"></i>
-
-        Agregar al carrito
-
+    <div class="acciones">
+      <button class="agregar" type="button" (click)="agregarAlCarrito()" [attr.aria-label]="'Agregar ' + nombre + ' al carrito'">
+        <i class="bi bi-cart-plus" aria-hidden="true"></i> Agregar
       </button>
-
-      <button
-        class="btn btn-outline-secondary"
-        (click)="abrirQuickView()">
-
-        <i class="bi bi-eye"></i>
-
+      <button class="vista" type="button" (click)="abrirQuickView()" [attr.aria-label]="'Vista rápida: ' + nombre" title="Vista rápida">
+        <i class="bi bi-eye" aria-hidden="true"></i>
       </button>
-
     </div>
-
   </div>
+</article>
 
-</div>
-
-<app-quick-view
-  *ngIf="mostrarQuickView"
-  [producto]="{
-    nombre: nombre,
-    precio: precio,
-    imagen: imagen
-  }"
-  (cerrar)="cerrarQuickView()">
-</app-quick-view>
+@if (mostrarQuickView) {
+  <app-quick-view [producto]="{ slug, nombre, precio, imagen, descripcion, variantes }" (cerrar)="cerrarQuickView()"></app-quick-view>
+}

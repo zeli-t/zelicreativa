@@ -1,228 +1,50 @@
-<app-hero></app-hero>
+﻿<app-hero></app-hero>
 
-<!-- CATEGORÍAS -->
-
-<section class="container py-5">
-
-  <h2 class="text-center mb-4">
-    Explora nuestras categorías
-  </h2>
-
-  <div class="row g-4">
-
-    <div class="col-6 col-md-4">
-      <app-card-categoria
-        nombre="Libretas"
-        descripcion="Libretas bonitas y personalizadas."
-        imagen="libreta.jpg">
-      </app-card-categoria>
-    </div>
-
-    <div class="col-6 col-md-4">
-      <app-card-categoria
-        nombre="Escritura"
-        descripcion="Plumas y accesorios para escribir."
-        imagen="marcadores2.jpg">
-      </app-card-categoria>
-    </div>
-
-    <div class="col-6 col-md-4">
-      <app-card-categoria
-        nombre="Marcadores"
-        descripcion="Colores y marcadores para tus ideas."
-        imagen="marcadores4.jpg">
-      </app-card-categoria>
-    </div>
-
-    <div class="col-6 col-md-4">
-      <app-card-categoria
-        nombre="Stickers"
-        descripcion="Dale un toque especial a tus proyectos."
-        imagen="stickers.jpg">
-      </app-card-categoria>
-    </div>
-
-    <div class="col-6 col-md-4">
-      <app-card-categoria
-        nombre="Journaling"
-        descripcion="Todo para decorar y organizar tu journal."
-        imagen="kit.jpg">
-      </app-card-categoria>
-    </div>
-
-    <div class="col-6 col-md-4">
-      <app-card-categoria
-        nombre="Kits creativos"
-        descripcion="Kits completos para dejar volar tu creatividad."
-        imagen="azul.jpg">
-      </app-card-categoria>
-    </div>
-
+<section class="container portada-seccion" aria-labelledby="categorias-titulo">
+  <div class="encabezado">
+    <h2 id="categorias-titulo">Explora por categoría</h2>
+    <a routerLink="/catalogo" class="zeli-link">Ver todo el catálogo</a>
   </div>
-
+  @if (catalogo.estadoCarga() === 'listo') {
+    <div class="categorias-grid">
+      @for (categoria of catalogo.contenido().categorias; track categoria.id) {
+        <app-card-categoria [slug]="categoria.slug" [nombre]="categoria.nombre"
+          [descripcion]="categoria.descripcion ?? ''" [imagen]="categoria.imagen"></app-card-categoria>
+      } @empty {
+        <p class="text-muted">Todavía no hay categorías disponibles.</p>
+      }
+    </div>
+  } @else if (catalogo.estadoCarga() === 'error') {
+    <p role="alert">{{ catalogo.error() }}</p>
+    <button type="button" class="btn btn-outline-dark" (click)="catalogo.cargar()">Reintentar</button>
+  } @else {
+    <p role="status">Cargando categorías…</p>
+  }
 </section>
 
-
-<!-- PRODUCTOS -->
-
-<section class="container py-5">
-
-  <h2 class="text-center mb-4">
-    Productos destacados
-  </h2>
-
-
-  <!-- BÚSQUEDA Y FILTROS -->
-
-  <div class="filtros mb-4">
-
-    <div class="row g-3">
-
-      <!-- BUSCAR -->
-
-      <div class="col-md-5">
-
-        <label>Buscar producto</label>
-
-        <div class="input-group">
-
-          <span class="input-group-text">
-            <i class="bi bi-search"></i>
-          </span>
-
-          <input
-            type="text"
-            class="form-control"
-            [(ngModel)]="busqueda"
-            placeholder="Ej. marcadores, libreta...">
-
-        </div>
-
-      </div>
-
-
-      <!-- CATEGORÍA -->
-
-      <div class="col-md-3">
-
-        <label>Categoría</label>
-
-        <select
-          class="form-select"
-          [(ngModel)]="categoriaSeleccionada">
-
-          <option value="Todas">
-            Todas
-          </option>
-
-          <option value="Libretas">
-            Libretas
-          </option>
-
-          <option value="Escritura">
-            Escritura
-          </option>
-
-          <option value="Marcadores">
-            Marcadores
-          </option>
-
-          <option value="Stickers">
-            Stickers
-          </option>
-
-        </select>
-
-      </div>
-
-
-      <!-- PRECIO -->
-
-      <div class="col-md-2">
-
-        <label>Precio máximo</label>
-
-        <input
-          type="number"
-          class="form-control"
-          [(ngModel)]="precioMaximo"
-          min="0">
-
-      </div>
-
-
-      <!-- ORDEN -->
-
-      <div class="col-md-2">
-
-        <label>Ordenar</label>
-
-        <select
-          class="form-select"
-          [(ngModel)]="orden">
-
-          <option value="normal">
-            Normal
-          </option>
-
-          <option value="menor">
-            Menor precio
-          </option>
-
-          <option value="mayor">
-            Mayor precio
-          </option>
-
-          <option value="nombre">
-            Nombre
-          </option>
-
-        </select>
-
-      </div>
-
+@if (catalogo.estadoCarga() === 'listo') {
+  <section class="container portada-seccion" aria-labelledby="recomendados-titulo">
+    <div class="encabezado">
+      <h2 id="recomendados-titulo">Descubre nuestra papelería</h2>
     </div>
-
-  </div>
-
-
-  <!-- RESULTADOS -->
-
-  <div class="row g-4">
-
-    <div
-      class="col-6 col-md-3"
-      *ngFor="let producto of productosFiltrados">
-
-      <app-card-producto
-        [nombre]="producto.nombre"
-        [precio]="producto.precio"
-        [imagen]="producto.imagen"
-        [oferta]="producto.oferta"
-        [precioAnterior]="producto.precioAnterior">
-      </app-card-producto>
-
+    <div class="zeli-products">
+      @for (producto of recomendados(); track producto.id) {
+        <app-card-producto [slug]="producto.slug" [nombre]="producto.nombre" [precio]="producto.precio"
+          [imagen]="producto.imagen" [oferta]="producto.oferta" [precioAnterior]="producto.precioAnterior"
+          [descripcion]="producto.descripcion" [variantes]="producto.variantes"></app-card-producto>
+      } @empty {
+        <p class="text-muted">Todavía no hay productos disponibles.</p>
+      }
     </div>
+  </section>
+}
 
+<section class="container portada-seccion">
+  <div class="identidad">
+    <i class="bi bi-pencil-heart" aria-hidden="true"></i>
+    <div>
+      <h2>Hazlo a tu manera</h2>
+      <p>En Zeli Creativa nos gusta la papelería que acompaña las ideas de todos los días, desde la primera nota hasta la última página de tu libreta.</p>
+    </div>
   </div>
-
-
-  <!-- SIN RESULTADOS -->
-
-  <div
-    *ngIf="productosFiltrados.length === 0"
-    class="sin-resultados text-center py-5">
-
-    <i class="bi bi-search"></i>
-
-    <h5 class="mt-3">
-      No encontramos productos
-    </h5>
-
-    <p>
-      Intenta con otra búsqueda o cambia los filtros.
-    </p>
-
-  </div>
-
 </section>

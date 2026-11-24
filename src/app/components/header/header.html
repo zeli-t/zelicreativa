@@ -1,158 +1,65 @@
-<nav 
-  class="navbar navbar-expand-lg" 
-  data-bs-theme="light" 
-  style="background-color: rgb(255, 190, 210);"> 
+<header class="cabecera-tienda">
+  <div class="container barra">
+    <a class="marca" routerLink="/inicio" aria-label="Zeli Creativa, inicio">
+      <img src="zc.png" alt="Zeli Creativa" width="152" height="58">
+    </a>
 
-  <div class="container-fluid"> 
+    <div class="buscador" (keydown.escape)="ocultarSugerencias()" (focusout)="alSalirDelBuscador($event)">
+      <form role="search" (ngSubmit)="realizarBusqueda()">
+        <input type="search" name="busqueda" [(ngModel)]="busqueda" (ngModelChange)="buscar()"
+          aria-label="Buscar productos" placeholder="Buscar libretas, plumas, stickers…" autocomplete="off">
+        <button type="submit" aria-label="Buscar"><i class="bi bi-search" aria-hidden="true"></i></button>
+      </form>
 
+      @if (sugerencias.length) {
+        <ul class="sugerencias">
+          @for (sugerencia of sugerencias; track sugerencia) {
+            <li><button type="button" (click)="seleccionarSugerencia(sugerencia)">
+              <i class="bi bi-search" aria-hidden="true"></i> {{ sugerencia }}
+            </button></li>
+          }
+        </ul>
+      }
+    </div>
 
-<a 
-  class="navbar-brand d-flex align-items-center gap-2" 
-  routerLink="/inicio"> 
+    <div class="acciones">
+      @if (auth.sesion()) {
+        <details class="cuenta" #cuenta (keydown.escape)="cerrarMenu(cuenta, true)"
+          (focusout)="alSalirDelMenu($event, cuenta)">
+          <summary class="acceso-cuenta" [title]="nombreCuenta() ? 'Hola, ' + nombreCuenta() : 'Mi cuenta'">
+            <i class="bi bi-person-fill" aria-hidden="true"></i>
+            <span>{{ nombreCuenta() ? 'Hola, ' + nombreCuenta() : 'Mi cuenta' }}</span>
+            <i class="bi bi-chevron-down indicador" aria-hidden="true"></i>
+          </summary>
+          <div class="opciones-cuenta">
+            <a routerLink="/mi-cuenta" (click)="cerrarMenu(cuenta)">Mi cuenta</a>
+            <a routerLink="/mis-direcciones" (click)="cerrarMenu(cuenta)">Mis direcciones</a>
+            <a routerLink="/mis-pedidos" (click)="cerrarMenu(cuenta)">Mis pedidos</a>
+            @if (admin.esAdmin()) {
+              <a routerLink="/admin" (click)="cerrarMenu(cuenta)">Administración</a>
+            }
+            <button type="button" [disabled]="cierreSesion.pendiente()" [attr.aria-busy]="cierreSesion.pendiente()"
+              (click)="cierreSesion.salir()">
+              @if (cierreSesion.pendiente()) { <span class="spinner-border spinner-border-sm cargando-cierre me-1" aria-hidden="true"></span> }
+              {{ cierreSesion.pendiente() ? 'Cerrando sesión…' : 'Cerrar sesión' }}
+            </button>
+          </div>
+        </details>
+      } @else {
+        <a routerLink="/iniciar-sesion" class="acceso-cuenta">
+          <i class="bi bi-person" aria-hidden="true"></i><span>Iniciar sesión</span>
+        </a>
+      }
+      <a routerLink="/lista-deseos" aria-label="Favoritos" title="Favoritos"><i class="bi bi-heart" aria-hidden="true"></i></a>
+      <button type="button" [attr.aria-label]="'Carrito, ' + cantidadCarrito() + ' unidades'" title="Carrito"
+        [attr.aria-expanded]="carritoAbierto" (click)="abrirCarrito()">
+        <i class="bi bi-bag" aria-hidden="true"></i>
+        @if (cantidadCarrito()) { <span class="contador" aria-hidden="true">{{ cantidadCarrito() }}</span> }
+      </button>
+    </div>
+  </div>
+</header>
 
-  <img
-    src="zc.png"
-    alt="Zeli Creativa"
-    class="logo-header">
-
-
-</a> 
-
-<button 
-  class="navbar-toggler" 
-  type="button" 
-  data-bs-toggle="collapse" 
-  data-bs-target="#navbarZeli" 
-  aria-controls="navbarZeli" 
-  aria-expanded="false" 
-  aria-label="Toggle navigation"> 
-
-  <span class="navbar-toggler-icon"></span> 
-
-</button> 
-
-<div 
-  class="collapse navbar-collapse" 
-  id="navbarZeli"> 
-
-  <ul class="navbar-nav me-auto my-2 my-lg-0"> 
-
-    <li class="nav-item dropdown"> 
-
-      <a 
-        class="nav-link dropdown-toggle" 
-        href="#" 
-        role="button" 
-        data-bs-toggle="dropdown" 
-        aria-expanded="false"> 
-
-        Categorías 
-
-      </a> 
-
-      <ul class="dropdown-menu"> 
-
-        <li><a class="dropdown-item" href="#">Libretas</a></li>
-        <li><a class="dropdown-item" href="#">Escritura</a></li>
-        <li><a class="dropdown-item" href="#">Marcadores</a></li>
-        <li><a class="dropdown-item" href="#">Stickers</a></li>
-        <li><a class="dropdown-item" href="#">Journaling</a></li>
-        <li><a class="dropdown-item" href="#">Kits creativos</a></li>
-
-      </ul> 
-
-    </li> 
-
-  </ul> 
-
-  <div class="position-relative"> 
-
-    <form 
-      class="d-flex" 
-      role="search" 
-      (ngSubmit)="realizarBusqueda()"> 
-
-      <input 
-        class="form-control me-2" 
-        type="search" 
-        name="busqueda" 
-        [(ngModel)]="busqueda" 
-        (input)="buscar()" 
-        placeholder="Buscar productos..." 
-        autocomplete="off"> 
-
-      <button 
-        class="btn btn-outline-dark" 
-        type="submit"> 
-
-        <i class="bi bi-search"></i> 
-
-      </button> 
-
-    </form> 
-
-    <div 
-      *ngIf="sugerencias.length > 0" 
-      class="sugerencias"> 
-
-      <button 
-        type="button" 
-        class="sugerencia" 
-        *ngFor="let sugerencia of sugerencias" 
-        (click)="seleccionarSugerencia(sugerencia)"> 
-
-        <i class="bi bi-search"></i>
-        {{ sugerencia }} 
-
-      </button> 
-
-    </div> 
-
-  </div> 
-
-  <div class="d-flex align-items-center ms-3 gap-3"> 
-
-    <a 
-      routerLink="/iniciar-sesion" 
-      class="text-dark"> 
-
-      <i class="bi bi-person-circle fs-4"></i> 
-
-    </a> 
-
-    <a 
-      routerLink="/lista-deseos" 
-      class="text-dark"> 
-
-      <i class="bi bi-heart fs-4"></i> 
-
-    </a> 
-
-    <button 
-      class="btn btn-link text-dark position-relative p-0" 
-      type="button" 
-      (click)="abrirCarrito()"> 
-
-      <i class="bi bi-cart3 fs-4"></i> 
-
-      <span 
-        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"> 
-
-        {{ cantidadCarrito }} 
-
-      </span> 
-
-    </button> 
-
-  </div> 
-
-</div> 
-```
-
-  </div> 
-
-</nav> 
-
-<app-carrito-lateral
-*ngIf="carritoAbierto"
-(cerrar)="cerrarCarrito()"> </app-carrito-lateral>
+@if (carritoAbierto) {
+  <app-carrito-lateral (cerrar)="cerrarCarrito()"></app-carrito-lateral>
+}

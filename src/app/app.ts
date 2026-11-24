@@ -1,4 +1,5 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
+import { CierreSesion } from './services/cierre-sesion';
 
 @Component({
   selector: 'app-root',
@@ -8,4 +9,5 @@ import { Component, signal } from '@angular/core';
 })
 export class App {
   protected readonly title = signal('papevirtual');
+  readonly cierreSesion = inject(CierreSesion);
 }

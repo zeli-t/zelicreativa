@@ -1,524 +1,167 @@
-<div class="container py-5">
-
+﻿<div class="container py-5">
   <div class="row justify-content-center">
-
     <div class="col-lg-9">
-
-      <h2 class="text-center mb-4">
-        <i class="bi bi-bag-check"></i>
-        Finalizar compra
-      </h2>
-
-      <!-- PASOS -->
+      <h2 class="text-center mb-4"><i class="bi bi-bag-check"></i> Finalizar compra</h2>
 
       <div class="pasos mb-4">
-
-        <div
-          class="paso"
-          [class.activo]="paso === 1">
-
-          <span>1</span>
-          Datos de envío
-
-        </div>
-
-        <div
-          class="paso"
-          [class.activo]="paso === 2">
-
-          <span>2</span>
-          Pago
-
-        </div>
-
+        <div class="paso" [class.activo]="paso === 1"><span>1</span> Datos de envío</div>
+        <div class="paso" [class.activo]="paso === 2"><span>2</span> Revisión</div>
       </div>
 
-
-      <!-- PASO 1 -->
-
-      <div
-        class="card p-4"
-        *ngIf="paso === 1">
-
-        <h4 class="mb-4">
-          <i class="bi bi-truck"></i>
-          Datos de envío
-        </h4>
-
-
-        <div class="row">
-
-          <!-- NOMBRE -->
-
-          <div class="col-md-6 mb-3">
-
-            <label>Nombre completo</label>
-
-            <input
-              type="text"
-              class="form-control"
-              [(ngModel)]="nombre"
-              [class.is-invalid]="enviado && !nombre"
-              [class.is-valid]="nombre"
-              placeholder="Tu nombre">
-
-            <div
-              class="invalid-feedback"
-              *ngIf="enviado && !nombre">
-
-              El nombre es obligatorio.
-
-            </div>
-
-          </div>
-
-
-          <!-- CORREO -->
-
-          <div class="col-md-6 mb-3">
-
-            <label>Correo electrónico</label>
-
-            <input
-              type="email"
-              class="form-control"
-              [(ngModel)]="correo"
-              [class.is-invalid]="enviado && !correo"
-              [class.is-valid]="correo"
-              placeholder="correo@ejemplo.com">
-
-            <div
-              class="invalid-feedback"
-              *ngIf="enviado && !correo">
-
-              El correo es obligatorio.
-
-            </div>
-
-          </div>
-
-
-          <!-- DIRECCIÓN -->
-
-          <div class="col-12 mb-3">
-
-            <label>Dirección</label>
-
-            <input
-              type="text"
-              class="form-control"
-              [(ngModel)]="direccion"
-              [class.is-invalid]="enviado && !direccion"
-              [class.is-valid]="direccion"
-              placeholder="Calle, número y colonia">
-
-            <div
-              class="invalid-feedback"
-              *ngIf="enviado && !direccion">
-
-              La dirección es obligatoria.
-
-            </div>
-
-          </div>
-
-
-          <!-- CIUDAD -->
-
-          <div class="col-md-6 mb-3">
-
-            <label>Ciudad</label>
-
-            <input
-              type="text"
-              class="form-control"
-              [(ngModel)]="ciudad"
-              [class.is-invalid]="enviado && !ciudad"
-              [class.is-valid]="ciudad"
-              placeholder="Ciudad">
-
-            <div
-              class="invalid-feedback"
-              *ngIf="enviado && !ciudad">
-
-              La ciudad es obligatoria.
-
-            </div>
-
-          </div>
-
-
-          <!-- CÓDIGO POSTAL -->
-
-          <div class="col-md-3 mb-3">
-
-            <label>Código postal</label>
-
-            <input
-              type="text"
-              class="form-control"
-              [(ngModel)]="codigoPostal"
-              (input)="calcularEnvio()"
-              maxlength="5"
-              placeholder="00000"
-              [class.is-invalid]="enviado && !/^\d{5}$/.test(codigoPostal)"
-              [class.is-valid]="/^\d{5}$/.test(codigoPostal)">
-
-            <div
-              class="invalid-feedback"
-              *ngIf="enviado && !/^\d{5}$/.test(codigoPostal)">
-
-              Ingresa un código postal válido de 5 dígitos.
-
-            </div>
-
-          </div>
-
-
-          <!-- TELÉFONO -->
-
-          <div class="col-md-3 mb-3">
-
-            <label>Teléfono</label>
-
-            <input
-              type="tel"
-              class="form-control"
-              [(ngModel)]="telefono"
-              [class.is-invalid]="enviado && !telefono"
-              [class.is-valid]="telefono"
-              placeholder="10 dígitos">
-
-            <div
-              class="invalid-feedback"
-              *ngIf="enviado && !telefono">
-
-              El teléfono es obligatorio.
-
-            </div>
-
-          </div>
-
+      @if (!auth.sesion()) {
+        <div class="card p-4">
+          <p role="status">Inicia sesión para continuar. Tu carrito se conserva.</p>
+          <a routerLink="/iniciar-sesion" [queryParams]="{ volver: 'checkout' }" class="btn btn-dark">Iniciar sesión</a>
         </div>
+      } @else if (paso === 1) {
+        <div class="card p-4">
+          <h4 class="mb-4"><i class="bi bi-truck"></i> Datos de envío</h4>
+          <p>Consulta el <a routerLink="/privacidad" target="_blank" rel="noopener">aviso de privacidad</a> antes de guardar tus datos.</p>
+          @if (pedidos.habilitado) {
+            <p><a routerLink="/mis-direcciones" [queryParams]="{ volver: 'checkout' }">Administrar mis direcciones</a></p>
+          }
+          <nav class="d-flex flex-wrap gap-3 mb-3" aria-label="Ayuda sobre la compra">
+            <a routerLink="/envios" target="_blank" rel="noopener">Envíos</a>
+            <a routerLink="/cambios-y-devoluciones" target="_blank" rel="noopener">Cambios y devoluciones</a>
+            <a routerLink="/contacto" target="_blank" rel="noopener">Contacto</a>
+          </nav>
 
+          @if (cargandoDirecciones()) {
+            <p role="status">Cargando direcciones…</p>
+          }
+          @if (errorDirecciones()) {
+            <p role="alert" class="text-danger">{{ errorDirecciones() }}</p>
+            <button type="button" class="btn btn-outline-dark align-self-start mb-3" (click)="cargarDirecciones()">Reintentar</button>
+          }
+          @if (direcciones().length) {
+            <label for="checkout-direccion">Dirección guardada</label>
+            <select id="checkout-direccion" class="form-select mb-3" [ngModel]="direccionId"
+              (ngModelChange)="elegirDireccion($event)" [disabled]="guardandoDireccion()">
+              <option [ngValue]="null">Usar una dirección nueva</option>
+              @for (opcion of direcciones(); track opcion.id) {
+                <option [ngValue]="opcion.id">{{ opcion.calle }} {{ opcion.numero }}, {{ opcion.colonia }}, {{ opcion.ciudad }}</option>
+              }
+            </select>
+          }
 
-        <!-- CUPÓN -->
+          <fieldset [disabled]="guardandoDireccion()">
+            <div class="row">
+              @for (campo of camposDireccion; track campo.id) {
+                <div class="mb-3" [class]="campo.clase">
+                  <label [for]="'checkout-' + campo.id">{{ campo.etiqueta }}</label>
+                  <input [id]="'checkout-' + campo.id" type="text" class="form-control"
+                    [attr.autocomplete]="campo.autocomplete"
+                    [attr.inputmode]="campo.id === 'codigo_postal' ? 'numeric' : null"
+                    [attr.maxlength]="campo.id === 'codigo_postal' ? 5 : null"
+                    [readonly]="direccionId !== null"
+                    [(ngModel)]="direccion[campo.id]"
+                    [class.is-invalid]="enviado && !campoValido(campo.id)"
+                    [class.is-valid]="campoValido(campo.id)" required>
+                  @if (enviado && !campoValido(campo.id)) {
+                    <div class="invalid-feedback">
+                      {{ campo.id === 'codigo_postal' ? 'Ingresa un código postal de 5 dígitos.' : 'Completa este campo.' }}
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </fieldset>
 
-        <div class="cupon mt-3">
-
-          <label>
-            <i class="bi bi-ticket-perforated"></i>
-            ¿Tienes un cupón?
-          </label>
-
-          <div class="d-flex gap-2 mt-2">
-
-            <input
-              type="text"
-              class="form-control"
-              [(ngModel)]="cupon"
-              placeholder="Ingresa tu cupón">
-
-            <button
-              class="btn btn-outline-dark"
-              (click)="aplicarCupon()">
-
-              Aplicar
-
+          @if (direccionId === null) {
+            <button type="button" class="btn btn-outline-dark align-self-start mb-2"
+              [disabled]="guardandoDireccion()" (click)="guardarDireccion()">
+              {{ guardandoDireccion() ? 'Guardando…' : 'Guardar dirección' }}
             </button>
+          }
+          @if (avisoDireccion()) { <p role="status" class="mb-2">{{ avisoDireccion() }}</p> }
+          @if (errorGuardado()) { <p role="alert" class="text-danger mb-2">{{ errorGuardado() }}</p> }
 
+          <div class="mt-3">
+            <label for="checkout-telefono">Teléfono de entrega</label>
+            <input id="checkout-telefono" type="tel" class="form-control" autocomplete="tel"
+              [(ngModel)]="telefonoEntrega" required
+              [class.is-invalid]="telefonoRevisado && !telefonoEntregaNormalizado"
+              [attr.aria-invalid]="telefonoRevisado && !telefonoEntregaNormalizado ? 'true' : null"
+              [attr.aria-describedby]="telefonoRevisado && !telefonoEntregaNormalizado ? 'checkout-telefono-error' : null">
+            @if (telefonoRevisado && !telefonoEntregaNormalizado) {
+              <div id="checkout-telefono-error" class="invalid-feedback">
+                Ingresa un teléfono mexicano de 10 dígitos, con prefijo +52 opcional.
+              </div>
+            }
           </div>
 
-        </div>
-
-
-        <!-- RESUMEN -->
-
-        <div class="resumen mt-4">
-
-          <div>
-            <span>Subtotal</span>
-            <strong>${{ subtotal }}</strong>
-          </div>
-
-          <div>
-            <span>IVA (16%)</span>
-            <strong>${{ impuestos | number:'1.2-2' }}</strong>
-          </div>
-
-          <div>
-            <span>Envío</span>
-            <strong>${{ envio }}</strong>
-          </div>
-
-          <div *ngIf="descuento > 0">
-
-            <span>Descuento</span>
-
-            <strong>
-              -${{ descuento }}
-            </strong>
-
-          </div>
-
-          <hr>
-
-          <div class="total">
-
-            <span>Total</span>
-
-            <strong>
-              ${{ total | number:'1.2-2' }}
-            </strong>
-
-          </div>
-
-        </div>
-
-
-        <button
-          class="btn btn-dark w-100 mt-4"
-          (click)="siguientePaso()">
-
-          Continuar al pago
-          <i class="bi bi-arrow-right"></i>
-
-        </button>
-
-      </div>
-
-
-      <!-- PASO 2 -->
-
-      <div
-        class="card p-4"
-        *ngIf="paso === 2">
-
-        <h4 class="mb-4">
-
-          <i class="bi bi-credit-card"></i>
-
-          Método de pago
-
-        </h4>
-
-
-        <div class="metodos">
-
-          <label
-            class="metodo"
-            [class.seleccionado]="metodoPago === 'tarjeta'">
-
-            <input
-              type="radio"
-              name="pago"
-              value="tarjeta"
-              [(ngModel)]="metodoPago">
-
-            <i class="bi bi-credit-card"></i>
-
-            Tarjeta
-
-          </label>
-
-
-          <label
-            class="metodo"
-            [class.seleccionado]="metodoPago === 'transferencia'">
-
-            <input
-              type="radio"
-              name="pago"
-              value="transferencia"
-              [(ngModel)]="metodoPago">
-
-            <i class="bi bi-bank"></i>
-
-            Transferencia
-
-          </label>
-
-
-          <label
-            class="metodo"
-            [class.seleccionado]="metodoPago === 'paypal'">
-
-            <input
-              type="radio"
-              name="pago"
-              value="paypal"
-              [(ngModel)]="metodoPago">
-
-            <i class="bi bi-paypal"></i>
-
-            PayPal
-
-          </label>
-
-        </div>
-
-
-        <!-- TARJETA -->
-
-        <div
-          *ngIf="metodoPago === 'tarjeta'"
-          class="mt-4">
-
-          <div class="mb-3">
-
-            <label>Número de tarjeta</label>
-
-            <input
-              type="text"
-              class="form-control"
-              [(ngModel)]="numeroTarjeta"
-              maxlength="16"
-              placeholder="0000 0000 0000 0000">
-
-          </div>
-
-
-          <div class="row">
-
-            <div class="col-md-6 mb-3">
-
-              <label>Fecha de vencimiento</label>
-
-              <input
-                type="text"
-                class="form-control"
-                [(ngModel)]="vencimiento"
-                placeholder="MM/AA">
-
+          <div class="cupon mt-3">
+            <label for="checkout-cupon"><i class="bi bi-ticket-perforated"></i> ¿Tienes un cupón?</label>
+            <div class="mt-2">
+              <input id="checkout-cupon" type="text" class="form-control" [(ngModel)]="cupon" placeholder="Ingresa tu cupón">
             </div>
+          </div>
 
+          <ng-container *ngTemplateOutlet="resumen"></ng-container>
 
-            <div class="col-md-6 mb-3">
-
-              <label>CVV</label>
-
-              <input
-                type="password"
-                class="form-control"
-                [(ngModel)]="cvv"
-                maxlength="3"
-                placeholder="000">
-
+          @if (!pedidos.habilitado) {
+            <p class="mt-3 mb-0" role="status">La compra simulada está disponible en el entorno de pruebas.</p>
+          }
+          @if (errorCompra) { <p class="text-danger mt-3" role="alert">{{ errorCompra }}</p> }
+          <button type="button" class="btn btn-dark w-100 mt-4" [disabled]="guardandoDireccion() || enviando || !pedidos.habilitado" (click)="siguientePaso()">
+            {{ enviando ? 'Consultando total…' : 'Revisar compra' }} <i class="bi bi-arrow-right"></i>
+          </button>
+        </div>
+      } @else {
+        <div class="card p-4">
+          <h4 class="mb-4"><i class="bi bi-bag-check"></i> Revisar compra</h4>
+          <p class="mb-1"><strong>{{ direccion.destinatario }}</strong></p>
+          <p>{{ direccion.calle }} {{ direccion.numero }}, {{ direccion.colonia }}, {{ direccion.ciudad }}, {{ direccion.estado }}, {{ direccion.codigo_postal }}</p>
+          <p>Teléfono de entrega: {{ telefonoEntregaNormalizado }}</p>
+          <p>Método de entrega: paquetería a domicilio. Plazo estimado: {{ plazoEntrega }}.</p>
+          @if (cotizacion; as importe) {
+            <ul class="list-group list-group-flush">
+              @for (producto of productos(); track producto.clave) {
+                <li class="list-group-item px-0">{{ producto.cantidad }} × {{ producto.nombre }}
+                  @if (producto.variante) { · {{ producto.variante }} }
+                </li>
+              }
+            </ul>
+            <div class="resumen mt-4" aria-label="Cotización del servidor en pesos mexicanos">
+              <div><span>Subtotal</span><strong>{{ importe.subtotal | currency:'MXN':'code' }}</strong></div>
+              <div><span>IVA</span><strong>{{ importe.iva | currency:'MXN':'code' }}</strong></div>
+              <div><span>Envío</span><strong>{{ importe.envio | currency:'MXN':'code' }}</strong></div>
+              @if (importe.descuento > 0) {
+                <div><span>Descuento</span><strong>{{ -importe.descuento | currency:'MXN':'code' }}</strong></div>
+              }
+              <hr>
+              <div class="total"><span>Total</span><strong>{{ importe.total | currency:'MXN':'code' }}</strong></div>
             </div>
-
+          }
+          <p class="mt-3">El pago y el envío son simulados para la demostración académica.</p>
+          <div class="form-check">
+            <input id="acepta-terminos" type="checkbox" class="form-check-input" [(ngModel)]="aceptaTerminos" [disabled]="enviando" required>
+            <label class="form-check-label" for="acepta-terminos">Acepto los
+              <a routerLink="/terminos" target="_blank" rel="noopener">términos y condiciones</a>
+              de la compra simulada.
+            </label>
           </div>
-
+          @if (errorCompra) { <p class="text-danger mt-3" role="alert">{{ errorCompra }}</p> }
+          <div class="botones mt-4">
+            <button type="button" class="btn btn-outline-secondary" [disabled]="enviando" (click)="regresarPaso()">
+              <i class="bi bi-arrow-left"></i> Regresar
+            </button>
+            <button type="button" class="btn btn-dark" [disabled]="enviando || !cotizacion || !aceptaTerminos" (click)="confirmarPago()">
+              {{ enviando ? 'Confirmando…' : 'Confirmar pago simulado' }}
+            </button>
+          </div>
         </div>
-
-
-        <!-- TRANSFERENCIA -->
-
-        <div
-          *ngIf="metodoPago === 'transferencia'"
-          class="mensaje-pago mt-4">
-
-          <i class="bi bi-bank"></i>
-
-          <p>
-            Al confirmar la compra se mostrarán los datos
-            necesarios para realizar la transferencia.
-          </p>
-
-        </div>
-
-
-        <!-- PAYPAL -->
-
-        <div
-          *ngIf="metodoPago === 'paypal'"
-          class="mensaje-pago mt-4">
-
-          <i class="bi bi-paypal"></i>
-
-          <p>
-            Serás dirigido a PayPal para completar el pago.
-            Esta opción está simulada para el proyecto.
-          </p>
-
-        </div>
-
-
-        <!-- RESUMEN -->
-
-        <div class="resumen mt-4">
-
-          <div>
-            <span>Subtotal</span>
-            <strong>${{ subtotal }}</strong>
-          </div>
-
-          <div>
-            <span>IVA</span>
-            <strong>${{ impuestos | number:'1.2-2' }}</strong>
-          </div>
-
-          <div>
-            <span>Envío</span>
-            <strong>${{ envio }}</strong>
-          </div>
-
-          <div *ngIf="descuento > 0">
-
-            <span>Descuento</span>
-
-            <strong>
-              -${{ descuento }}
-            </strong>
-
-          </div>
-
-          <hr>
-
-          <div class="total">
-
-            <span>Total</span>
-
-            <strong>
-              ${{ total | number:'1.2-2' }}
-            </strong>
-
-          </div>
-
-        </div>
-
-
-        <div class="botones mt-4">
-
-          <button
-            class="btn btn-outline-secondary"
-            (click)="regresarPaso()">
-
-            <i class="bi bi-arrow-left"></i>
-            Regresar
-
-          </button>
-
-
-          <button
-            class="btn btn-dark"
-            (click)="realizarPago()"
-            [disabled]="procesando">
-
-            <span
-              *ngIf="procesando"
-              class="spinner-border spinner-border-sm me-2">
-            </span>
-
-            {{ procesando ? 'Procesando pago...' : 'Confirmar y pagar' }}
-
-          </button>
-
-        </div>
-
-      </div>
-
+      }
     </div>
-
   </div>
-
 </div>
+
+<ng-template #resumen>
+  <div class="resumen mt-4" aria-label="Resumen estimado">
+    <div><span>Subtotal</span><strong>${{ subtotal }}</strong></div>
+    <div><span>IVA (16%)</span><strong>${{ impuestos | number:'1.2-2' }}</strong></div>
+    <div><span>Envío</span><strong>${{ envio }}</strong></div>
+    <hr>
+    <div class="total"><span>Total estimado</span><strong>${{ total | number:'1.2-2' }}</strong></div>
+  </div>
+</ng-template>

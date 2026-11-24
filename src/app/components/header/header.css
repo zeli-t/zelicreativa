@@ -1,103 +1,41 @@
-.logo-header {
-  width: 105px;
-  height: 95px;
-  object-fit: contain;
+.cabecera-tienda { background: #ffcfe0; }
+.barra { display: grid; grid-template-columns: auto minmax(0, 32rem) auto; align-items: center; justify-content: space-between; gap: .65rem clamp(1rem, 4vw, 3.5rem); padding-block: .65rem; }
+.marca { justify-self: start; }
+.marca img { display: block; width: clamp(7.1rem, 15vw, 9.5rem); height: 3.6rem; object-fit: contain; object-position: left center; }
+.buscador { position: relative; min-width: 0; }
+.buscador form { display: flex; min-height: 44px; background: #fffafd; border: 1px solid #dfafc3; border-radius: .7rem; }
+.buscador form:focus-within { outline: 2px solid var(--zeli-berry); outline-offset: 2px; }
+.buscador input { background: transparent; border: 0; border-radius: inherit; outline: 0; padding: .55rem .85rem; min-width: 0; width: 100%; }
+.buscador button, .acciones button { background: transparent; border: 0; color: inherit; }
+.buscador form button { min-width: 44px; }
+.acciones { display: flex; align-items: center; gap: .15rem; }
+.acciones > * { position: relative; color: var(--zeli-ink); display: grid; place-items: center; min-width: 44px; min-height: 44px; font-size: 1.25rem; text-decoration: none; border-radius: .65rem; }
+.acciones > :hover { background: #ffffff90; }
+.acciones > .acceso-cuenta, .acceso-cuenta {
+  display: flex; align-items: center; gap: .3rem; min-height: 44px;
+  padding-inline: .45rem; font-size: .875rem; font-weight: 600; white-space: nowrap;
 }
-
-.navbar-brand {
-  font-size: 24px;
-  font-weight: bold;
+.acceso-cuenta i:first-child { font-size: 1.25rem; }
+.acceso-cuenta span { max-width: clamp(5.5rem, 15vw, 9rem); overflow: hidden; text-overflow: ellipsis; }
+.cuenta summary { cursor: pointer; list-style: none; }
+.cuenta summary::-webkit-details-marker { display: none; }
+.indicador { font-size: .7rem; }
+.opciones-cuenta {
+  position: absolute; z-index: 25; top: 100%; right: 0; min-width: 10.5rem; padding: .35rem;
+  border: 1px solid var(--zeli-line); border-radius: .7rem; background: white;
+  box-shadow: 0 .5rem 1.5rem #30212b1a; font-size: .9rem;
 }
-
-.bi {
-  vertical-align: middle;
+.opciones-cuenta a, .opciones-cuenta button {
+  display: block; width: 100%; text-align: left; padding: .6rem .5rem;
+  border-radius: .35rem; color: var(--zeli-ink); text-decoration: none;
 }
-
-:host {
-  position: sticky;
-  top: 0;
-  z-index: 1100;
-}
-
-.sugerencias {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: calc(100% - 48px);
-  background-color: white;
-  border-radius: 0 0 10px 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-  overflow: hidden;
-  z-index: 3000;
-}
-
-.sugerencia {
-  display: block;
-  width: 100%;
-  border: none;
-  background-color: white;
-  text-align: left;
-  padding: 10px 15px;
-}
-
-.sugerencia:hover {
-  background-color: rgb(255, 230, 238);
-  color: #d94f7d;
-}
-
-
-/* =========================
-   DISEÑO PARA CELULAR
-   ========================= */
-
-@media (max-width: 576px) {
-
-  .logo-header {
-    width: 70px;
-    height: 65px;
-  }
-
-  .navbar-brand {
-    font-size: 18px;
-  }
-
-  .navbar {
-    padding: 5px 10px;
-  }
-
-  .navbar-toggler {
-    padding: 5px 8px;
-  }
-
-  .navbar-collapse {
-    padding-top: 10px;
-  }
-
-  .navbar-nav {
-    margin-bottom: 10px;
-  }
-
-  .position-relative {
-    width: 100%;
-  }
-
-  form.d-flex {
-    width: 100%;
-  }
-
-  form.d-flex .form-control {
-    width: 100%;
-  }
-
-  .d-flex.align-items-center.ms-3.gap-3 {
-    margin-left: 0 !important;
-    justify-content: center;
-    margin-top: 15px;
-    margin-bottom: 10px;
-  }
-
-  .sugerencias {
-    width: calc(100% - 48px);
-  }
-
+.opciones-cuenta a:hover, .opciones-cuenta button:hover { background: var(--zeli-blush); }
+.contador { position: absolute; inset: .1rem .02rem auto auto; padding-inline: .25rem; min-width: 1.1rem; border-radius: 2rem; font-size: .68rem; background: var(--zeli-berry); color: white; text-align: center; }
+.sugerencias { position: absolute; z-index: 20; top: calc(100% + .4rem); width: 100%; margin: 0; padding: .35rem; list-style: none; background: white; border: 1px solid var(--zeli-line); border-radius: .7rem; box-shadow: 0 .5rem 1.5rem #30212b1a; }
+.sugerencias button { width: 100%; text-align: left; min-height: 44px; border-radius: .35rem; }
+.sugerencias button:hover { background: var(--zeli-blush); }
+@media (max-width: 767px) {
+  .barra { grid-template-columns: 1fr auto; gap: .45rem; }
+  .marca img { height: 2.8rem; }
+  .buscador { grid-column: 1 / -1; grid-row: 2; margin-bottom: .15rem; }
 }

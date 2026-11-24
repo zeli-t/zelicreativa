@@ -52,6 +52,11 @@
       <div class="producto-info">
 
         <h6>{{ producto.nombre }}</h6>
+        @if (carrito.esValida(producto)) {
+          <small class="text-muted">{{ producto.variante }}</small>
+        } @else {
+          <small class="text-muted">Variante pendiente de verificar. Revisa el carrito.</small>
+        }
 
         <p>${{ producto.precio }}</p>
 
@@ -59,7 +64,7 @@
 
           <button
             class="btn btn-sm btn-outline-secondary"
-            (click)="disminuirCantidad(producto.nombre)">
+            (click)="carrito.disminuirCantidad(producto.clave)">
 
             −
 
@@ -71,7 +76,8 @@
 
           <button
             class="btn btn-sm btn-outline-secondary"
-            (click)="aumentarCantidad(producto.nombre)">
+            [disabled]="!carrito.esValida(producto) || producto.cantidad >= 10"
+            (click)="carrito.aumentarCantidad(producto.clave)">
 
             +
 
@@ -83,7 +89,7 @@
 
       <button
         class="btn btn-sm btn-link text-danger"
-        (click)="eliminarProducto(producto.nombre)">
+        (click)="carrito.eliminarProducto(producto.clave)">
 
         <i class="bi bi-trash"></i>
 
