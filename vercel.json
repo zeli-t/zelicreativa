@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "angular",
   "installCommand": "npm ci",
-  "buildCommand": "node scripts/generar-entorno.mjs production && npm run build -- --configuration production",
+  "buildCommand": "ZELI_SUPABASE_URL=\"$ZELI_DEMO_SUPABASE_URL\" ZELI_SUPABASE_PUBLISHABLE_KEY=\"$ZELI_DEMO_SUPABASE_PUBLISHABLE_KEY\" node scripts/generar-entorno.mjs checkout-test && npm run build -- --configuration checkout-test --source-map=false",
   "outputDirectory": "dist/papevirtual/browser",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
